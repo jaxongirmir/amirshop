@@ -39,6 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
+      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
     },
     onError: (error: Error) => {
       toast({
@@ -72,6 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
+      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
     },
     onError: (error: Error) => {
       toast({

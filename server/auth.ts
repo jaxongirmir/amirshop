@@ -5,7 +5,7 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
+import { User } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 
@@ -13,7 +13,12 @@ const PostgresSessionStore = connectPg(session);
 
 declare global {
   namespace Express {
-    interface User extends SelectUser {}
+    // Extend Express.User with our User type properties
+    interface User {
+      id: number;
+      username: string;
+      password: string;
+    }
   }
 }
 
@@ -33,22 +38,18 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Use a secure random string for the session secret
-  const sessionSecret = process.env.SESSION_SECRET || randomBytes(32).toString('hex');
-
   const sessionSettings: session.SessionOptions = {
-    secret: sessionSecret,
+    secret: process.env.SESSION_SECRET || "fashionzone-secret-key",
     resave: false,
     saveUninitialized: false,
     store: new PostgresSessionStore({ 
-      pool,
-      tableName: 'user_sessions',
-      createTableIfMissing: true
+      pool, 
+      tableName: "session",
+      createTableIfMissing: true 
     }),
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      secure: process.env.NODE_ENV === "production"
     }
   };
 

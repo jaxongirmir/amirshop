@@ -184,8 +184,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add to favorites
   apiRouter.post("/favorites", async (req: Request, res: Response) => {
     try {
-      // For simplicity, using fixed userId=1
-      const userId = 1;
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const userId = req.user!.id;
       const favoriteData = { ...req.body, userId };
 
       const validatedData = insertFavoriteSchema.parse(favoriteData);
@@ -204,8 +207,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "/favorites/:productId",
     async (req: Request, res: Response) => {
       try {
-        // For simplicity, using fixed userId=1
-        const userId = 1;
+        if (!req.isAuthenticated()) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+        
+        const userId = req.user!.id;
         const productId = parseInt(req.params.productId);
         if (isNaN(productId)) {
           return res.status(400).json({ message: "Invalid product ID" });
@@ -229,8 +235,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get notifications
   apiRouter.get("/notifications", async (req: Request, res: Response) => {
     try {
-      // For simplicity, using fixed userId=1
-      const userId = 1;
+      // If not authenticated, return some demo notifications
+      const userId = req.isAuthenticated() ? req.user!.id : 1;
       const notifications = await storage.getNotifications(userId);
       res.json(notifications);
     } catch (error) {
