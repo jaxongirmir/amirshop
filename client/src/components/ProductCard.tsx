@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "../contexts/CartContext";
 import { useFavorites } from "../contexts/FavoritesContext";
@@ -12,6 +13,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { toast } = useToast();
   const { addToCart } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
+  const [, navigate] = useLocation();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   
   // Format price from cents to dollars
@@ -57,13 +59,18 @@ export default function ProductCard({ product }: ProductCardProps) {
     ? product.availableSizes 
     : [];
   
+  const goToProductPage = () => {
+    navigate(`/product/${product.id}`);
+  };
+  
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 product-card">
       <div className="relative">
         <img 
           src={product.imageUrl} 
           alt={product.name} 
-          className="w-full h-80 object-cover"
+          className="w-full h-80 object-cover cursor-pointer"
+          onClick={goToProductPage}
         />
         <button 
           className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
@@ -75,7 +82,12 @@ export default function ProductCard({ product }: ProductCardProps) {
       
       <div className="p-4">
         <div className="flex justify-between mb-2">
-          <h3 className="font-semibold text-lg">{product.name}</h3>
+          <h3 
+            className="font-semibold text-lg cursor-pointer hover:text-primary transition-colors"
+            onClick={goToProductPage}
+          >
+            {product.name}
+          </h3>
           <span className="text-lg font-bold text-primary">{formattedPrice(product.price)}</span>
         </div>
         <p className="text-gray-600 text-sm mb-4">{product.description}</p>
