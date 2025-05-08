@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useMemo, ReactNode } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
@@ -31,12 +31,17 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cartTotal, setCartTotal] = useState(0);
-  
   // Fetch cart items
-  const { data: cartItems = [], isLoading, refetch } = useQuery<CartItem[]>({
+  const { data: cartItems = [], isLoading } = useQuery<CartItem[]>({
     queryKey: ['/api/cart'],
   });
+  
+  // Calculate cart total using useMemo to prevent unnecessary re-renders
+  const cartTotal = useMemo(() => {
+    return cartItems.reduce((sum, item) => {
+      return sum + (item.product.price * item.quantity);
+    }, 0);
+  }, [cartItems]);
   
   // Add to cart mutation
   const addToCartMutation = useMutation({
@@ -70,15 +75,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     },
   });
   
-  // Calculate cart total
-  useEffect(() => {
-    const total = cartItems.reduce((sum, item) => {
-      return sum + (item.product.price * item.quantity);
-    }, 0);
-    
-    setCartTotal(total);
-  }, [cartItems]);
-  
   // Context functions
   const addToCart = (item: AddToCartInput) => {
     addToCartMutation.mutate(item);
@@ -92,15 +88,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     updateCartItemMutation.mutate({ id, quantity });
   };
   
+  // Create memoized context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    cartItems,
+    isLoading,
+    cartTotal,
+    addToCart,
+    removeFromCart,
+    updateCartItemQuantity,
+  }), [cartItems, isLoading, cartTotal]);
+  
   return (
-    <CartContext.Provider value={{
-      cartItems,
-      isLoading,
-      cartTotal,
-      addToCart,
-      removeFromCart,
-      updateCartItemQuantity,
-    }}>
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );

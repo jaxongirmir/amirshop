@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useMemo, ReactNode } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
@@ -22,13 +22,16 @@ interface FavoritesContextType {
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
-  
   // Fetch favorites
   const { data: favorites = [], isLoading } = useQuery<Favorite[]>({
     queryKey: ['/api/favorites'],
   });
   
+  // Extract products from favorites for easy access using useMemo to prevent unnecessary re-renders
+  const favoriteProducts = useMemo(() => {
+    return favorites.map(favorite => favorite.product);
+  }, [favorites]);
+
   // Add to favorites mutation
   const addToFavoritesMutation = useMutation({
     mutationFn: async (productId: number) => {
@@ -50,14 +53,6 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     },
   });
   
-  // Extract products from favorites for easy access
-  useEffect(() => {
-    if (favorites) {
-      const products = favorites.map(favorite => favorite.product);
-      setFavoriteProducts(products);
-    }
-  }, [favorites]);
-  
   // Context functions
   const toggleFavorite = (productId: number) => {
     if (isFavorite(productId)) {
@@ -71,14 +66,16 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     return favorites.some(favorite => favorite.productId === productId);
   };
   
+  const contextValue = useMemo(() => ({
+    favorites,
+    favoriteProducts,
+    isLoading,
+    toggleFavorite,
+    isFavorite,
+  }), [favorites, favoriteProducts, isLoading]);
+
   return (
-    <FavoritesContext.Provider value={{
-      favorites,
-      favoriteProducts,
-      isLoading,
-      toggleFavorite,
-      isFavorite,
-    }}>
+    <FavoritesContext.Provider value={contextValue}>
       {children}
     </FavoritesContext.Provider>
   );
