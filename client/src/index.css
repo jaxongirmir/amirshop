@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 20 14.3% 4.1%;
+  --muted: 60 4.8% 95.9%;
+  --muted-foreground: 25 5.3% 44.7%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14.3% 4.1%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 14.3% 4.1%;
+  --border: 20 5.9% 90%;
+  --input: 20 5.9% 90%;
+  --primary: 220 18% 26%; /* FashionZone primary color */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 73% 67%; /* #F56565 */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 211 100% 61%; /* #4299E1 */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 60 9.1% 97.8%;
+  --ring: 211 100% 61%;
+  --radius: 0.5rem;
+
+  /* Chart colors */
+  --chart-1: 211 100% 61%;
+  --chart-2: 0 73% 67%;
+  --chart-3: 142 76% 51%;
+  --chart-4: 40 96% 60%;
+  --chart-5: 262 83% 62%;
+  
+  /* Sidebar colors */
+  --sidebar-background: 220 18% 26%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 211 100% 61%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 100%;
+  --sidebar-accent-foreground: 220 18% 26%;
+  --sidebar-border: 215 27.9% 16.9%;
+  --sidebar-ring: 211 100% 61%;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: 220 18% 26%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 73% 67%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 211 100% 61%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 240 4.9% 83.9%;
+  
+  /* Chart colors stay the same in dark mode */
+  
+  /* Sidebar colors */
+  --sidebar-background: 220 18% 26%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 211 100% 61%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 100%;
+  --sidebar-accent-foreground: 220 18% 26%;
+  --sidebar-border: 215 27.9% 16.9%;
+  --sidebar-ring: 211 100% 61%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-gray-50 text-gray-900;
+  }
+  
+  /* Smooth scrolling for page navigation */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom styles for header */
+.header-shadow {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Custom styles for footer - ensuring visibility */
+.footer {
+  background-color: hsl(var(--primary));
+  color: white;
+  padding: 3rem 0;
+}
+
+/* Custom badge styles */
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: hsl(var(--secondary));
+  color: white;
+  border-radius: 9999px;
+  height: 20px;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+/* Custom hover effects */
+.hover-scale {
+  transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.03);
+}
+
+/* Product card styles */
+.product-card {
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.product-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Size selector styles */
+.size-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.size-button:hover:not(.size-button-disabled) {
+  border-color: hsl(var(--accent));
+}
+
+.size-button-selected {
+  background-color: hsl(var(--primary));
+  color: white;
+}
+
+.size-button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
