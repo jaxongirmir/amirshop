@@ -4,6 +4,15 @@ import { useCart } from "../contexts/CartContext";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useQuery } from "@tanstack/react-query";
 import { useFilter } from "../contexts/FilterContext";
+import { useAuth } from "@/hooks/use-auth";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,13 +20,16 @@ export default function Header() {
   const { cartItems } = useCart();
   const { favorites } = useFavorites();
   const { setGender } = useFilter();
+  const { user, logoutMutation } = useAuth();
   
   // Get notifications
   const { data: notifications = [] } = useQuery({
     queryKey: ['/api/notifications'],
   });
   
-  const unreadNotifications = notifications.filter((notification: any) => !notification.read);
+  const unreadNotifications = Array.isArray(notifications) 
+    ? notifications.filter((notification: any) => !notification.read)
+    : [];
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,9 +112,33 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <Link href="#" className="hidden md:block text-gray-700 hover:text-accent transition-colors duration-200">
-              <i className="far fa-user text-xl"></i>
-            </Link>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden md:flex items-center text-gray-700 hover:text-accent transition-colors duration-200">
+                  <i className="fas fa-user text-xl mr-1"></i>
+                  <span className="text-sm">{user.username}</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">Профиль</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/orders">Мои заказы</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
+                    Выйти
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link href="/auth" className="hidden md:block text-gray-700 hover:text-accent transition-colors duration-200">
+                <i className="far fa-user text-xl mr-1"></i>
+                <span className="text-sm">Войти</span>
+              </Link>
+            )}
           </nav>
         </div>
 
