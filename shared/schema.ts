@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -7,6 +8,12 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+  cartItems: many(cartItems),
+  favorites: many(favorites),
+  notifications: many(notifications),
+}));
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -24,6 +31,11 @@ export const products = pgTable("products", {
   availableSizes: jsonb("available_sizes").notNull(),
 });
 
+export const productsRelations = relations(products, ({ many }) => ({
+  cartItems: many(cartItems),
+  favorites: many(favorites),
+}));
+
 export const insertProductSchema = createInsertSchema(products).omit({
   id: true,
 });
@@ -36,6 +48,17 @@ export const cartItems = pgTable("cart_items", {
   quantity: integer("quantity").notNull(),
 });
 
+export const cartItemsRelations = relations(cartItems, ({ one }) => ({
+  user: one(users, {
+    fields: [cartItems.userId],
+    references: [users.id],
+  }),
+  product: one(products, {
+    fields: [cartItems.productId],
+    references: [products.id],
+  }),
+}));
+
 export const insertCartItemSchema = createInsertSchema(cartItems).omit({
   id: true,
 });
@@ -45,6 +68,17 @@ export const favorites = pgTable("favorites", {
   userId: integer("user_id").notNull(),
   productId: integer("product_id").notNull(),
 });
+
+export const favoritesRelations = relations(favorites, ({ one }) => ({
+  user: one(users, {
+    fields: [favorites.userId],
+    references: [users.id],
+  }),
+  product: one(products, {
+    fields: [favorites.productId],
+    references: [products.id],
+  }),
+}));
 
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({
   id: true,
@@ -56,6 +90,13 @@ export const notifications = pgTable("notifications", {
   message: text("message").notNull(),
   read: boolean("read").notNull().default(false),
 });
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+  }),
+}));
 
 export const insertNotificationSchema = createInsertSchema(notifications).omit({
   id: true,
