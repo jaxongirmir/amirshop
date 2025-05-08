@@ -9,12 +9,10 @@ import {
   ChevronLeft, 
   ShoppingBag, 
   Heart, 
-  HeartFilled, 
   Truck, 
   PackageOpen, 
   ArrowLeft,
-  Star,
-  StarFilled
+  Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -163,9 +161,7 @@ export default function Product() {
             <div className="flex items-center mt-2">
               <div className="flex text-yellow-400 mr-2">
                 {[...Array(5)].map((_, i) => (
-                  i < 4 ? 
-                    <StarFilled key={i} className="h-4 w-4" /> : 
-                    <Star key={i} className="h-4 w-4" />
+                  <Star key={i} className={`h-4 w-4 ${i < 4 ? "fill-current" : ""}`} />
                 ))}
               </div>
               <span className="text-sm text-gray-500">(24 отзыва)</span>
@@ -238,11 +234,9 @@ export default function Product() {
               className="w-12 h-12 p-0"
               onClick={handleToggleFavorite}
             >
-              {isFavorite(product.id) ? (
-                <HeartFilled className="h-5 w-5 text-secondary" />
-              ) : (
-                <Heart className="h-5 w-5" />
-              )}
+              <Heart 
+                className={`h-5 w-5 ${isFavorite(product.id) ? "fill-secondary text-secondary" : ""}`} 
+              />
             </Button>
           </div>
           

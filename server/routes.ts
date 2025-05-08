@@ -1,6 +1,7 @@
 import express, { type Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth } from "./auth";
 import {
   insertCartItemSchema,
   insertFavoriteSchema,
@@ -9,6 +10,9 @@ import {
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  setupAuth(app);
+  
   // API routes
   const apiRouter = express.Router();
 
@@ -85,8 +89,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get cart items
   apiRouter.get("/cart", async (req: Request, res: Response) => {
     try {
-      // For simplicity, using fixed userId=1
-      const userId = 1;
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const userId = req.user!.id;
       const cartItems = await storage.getCartItemWithDetails(userId);
       res.json(cartItems);
     } catch (error) {
@@ -97,8 +104,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add to cart
   apiRouter.post("/cart", async (req: Request, res: Response) => {
     try {
-      // For simplicity, using fixed userId=1
-      const userId = 1;
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const userId = req.user!.id;
       const cartItemData = { ...req.body, userId };
 
       const validatedData = insertCartItemSchema.parse(cartItemData);
@@ -159,8 +169,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get favorites
   apiRouter.get("/favorites", async (req: Request, res: Response) => {
     try {
-      // For simplicity, using fixed userId=1
-      const userId = 1;
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const userId = req.user!.id;
       const favorites = await storage.getFavoritesWithDetails(userId);
       res.json(favorites);
     } catch (error) {

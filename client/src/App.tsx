@@ -6,11 +6,16 @@ import Home from "@/pages/Home";
 import Cart from "@/pages/Cart";
 import Favorites from "@/pages/Favorites";
 import Notifications from "@/pages/Notifications";
+import Product from "@/pages/Product";
+import AuthPage from "@/pages/auth-page";
+import Checkout from "@/pages/Checkout";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { FilterProvider } from "./contexts/FilterContext";
 import { CartProvider } from "./contexts/CartContext";
 import { FavoritesProvider } from "./contexts/FavoritesContext";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
   const [location] = useLocation();
@@ -26,9 +31,15 @@ function Router() {
       <main className="flex-grow">
         <Switch>
           <Route path="/" component={Home} />
-          <Route path="/cart" component={Cart} />
-          <Route path="/favorites" component={Favorites} />
-          <Route path="/notifications" component={Notifications} />
+          <Route path="/product/:id" component={Product} />
+          <Route path="/auth" component={AuthPage} />
+          
+          {/* Protected routes */}
+          <ProtectedRoute path="/cart" component={Cart} />
+          <ProtectedRoute path="/checkout" component={Checkout} />
+          <ProtectedRoute path="/favorites" component={Favorites} />
+          <ProtectedRoute path="/notifications" component={Notifications} />
+          
           {/* Fallback to 404 */}
           <Route component={NotFound} />
         </Switch>
@@ -41,13 +52,15 @@ function Router() {
 function App() {
   return (
     <TooltipProvider>
-      <FilterProvider>
-        <CartProvider>
-          <FavoritesProvider>
-            <Router />
-          </FavoritesProvider>
-        </CartProvider>
-      </FilterProvider>
+      <AuthProvider>
+        <FilterProvider>
+          <CartProvider>
+            <FavoritesProvider>
+              <Router />
+            </FavoritesProvider>
+          </CartProvider>
+        </FilterProvider>
+      </AuthProvider>
     </TooltipProvider>
   );
 }
