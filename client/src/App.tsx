@@ -1,7 +1,4 @@
 import { Switch, Route, useLocation } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect } from "react";
 import NotFound from "@/pages/not-found";
@@ -11,6 +8,9 @@ import Favorites from "@/pages/Favorites";
 import Notifications from "@/pages/Notifications";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { FilterProvider } from "./contexts/FilterContext";
+import { CartProvider } from "./contexts/CartContext";
+import { FavoritesProvider } from "./contexts/FavoritesContext";
 
 function Router() {
   const [location] = useLocation();
@@ -40,12 +40,15 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <TooltipProvider>
+      <FilterProvider>
+        <CartProvider>
+          <FavoritesProvider>
+            <Router />
+          </FavoritesProvider>
+        </CartProvider>
+      </FilterProvider>
+    </TooltipProvider>
   );
 }
 

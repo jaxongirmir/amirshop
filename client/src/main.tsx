@@ -1,16 +1,13 @@
 import { createRoot } from "react-dom/client";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/queryClient";
 import App from "./App";
 import "./index.css";
-import { CartProvider } from "./contexts/CartContext";
-import { FavoritesProvider } from "./contexts/FavoritesContext";
-import { FilterProvider } from "./contexts/FilterContext";
+import { Toaster } from "@/components/ui/toaster";
 
 createRoot(document.getElementById("root")!).render(
-  <FilterProvider>
-    <FavoritesProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </FavoritesProvider>
-  </FilterProvider>
+  <QueryClientProvider client={queryClient}>
+    <App />
+    <Toaster />
+  </QueryClientProvider>
 );
