@@ -278,7 +278,7 @@ export default function AuthPage() {
         {/* Hero Section */}
         <div className="w-full lg:w-1/2 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl p-8 text-center">
           <div className="max-w-md mx-auto">
-            <h1 className="text-3xl font-bold text-primary mb-4">Добро пожаловать в FashionZone</h1>
+            <h1 className="text-3xl font-bold text-primary mb-4">Добро пожаловать в AmirHub</h1>
             <p className="text-gray-700 mb-6">
               Создайте аккаунт, чтобы получить доступ к эксклюзивным предложениям, отслеживать статус заказов и сохранять товары в избранное.
             </p>
@@ -301,7 +301,7 @@ export default function AuthPage() {
               </div>
             </div>
             <p className="text-sm text-gray-500">
-              Присоединяйтесь к тысячам довольных клиентов FashionZone и наслаждайтесь удобством покупок онлайн.
+              Присоединяйтесь к тысячам довольных клиентов AmirHub и наслаждайтесь удобством покупок онлайн.
             </p>
           </div>
         </div>

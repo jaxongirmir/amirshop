@@ -51,7 +51,7 @@ export default function Header() {
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="text-2xl font-bold text-primary">
-            FashionZone
+            AmirHub
           </Link>
           
           {/* Search Bar */}
@@ -59,7 +59,7 @@ export default function Header() {
             <form onSubmit={handleSearch} className="relative">
               <input 
                 type="text" 
-                placeholder="Search for products..." 
+                placeholder="Поиск товаров..." 
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -78,7 +78,7 @@ export default function Header() {
                 location === '/' && useFilter().gender === 'men' ? 'text-accent' : ''
               }`}
             >
-              Men
+              Мужчинам
             </button>
             <button
               onClick={() => handleCategoryClick('women')}
@@ -86,7 +86,7 @@ export default function Header() {
                 location === '/' && useFilter().gender === 'women' ? 'text-accent' : ''
               }`}
             >
-              Women
+              Женщинам
             </button>
             <Link href="/favorites" className="relative text-gray-700 hover:text-accent transition-colors duration-200">
               <i className="far fa-heart text-xl"></i>
@@ -147,7 +147,7 @@ export default function Header() {
           <form onSubmit={handleSearch} className="relative">
             <input 
               type="text" 
-              placeholder="Search for products..." 
+              placeholder="Поиск товаров..." 
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
