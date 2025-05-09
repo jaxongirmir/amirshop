@@ -9,6 +9,8 @@ import Notifications from "@/pages/Notifications";
 import Product from "@/pages/Product";
 import AuthPage from "@/pages/auth-page";
 import Checkout from "@/pages/Checkout";
+import Profile from "@/pages/profile";
+import Orders from "@/pages/orders";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { FilterProvider } from "./contexts/FilterContext";
@@ -39,6 +41,8 @@ function Router() {
           <ProtectedRoute path="/checkout" component={Checkout} />
           <ProtectedRoute path="/favorites" component={Favorites} />
           <ProtectedRoute path="/notifications" component={Notifications} />
+          <ProtectedRoute path="/profile" component={Profile} />
+          <ProtectedRoute path="/orders" component={Orders} />
           
           {/* Fallback to 404 */}
           <Route component={NotFound} />
