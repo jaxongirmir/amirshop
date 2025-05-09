@@ -24,7 +24,11 @@ export default function Orders() {
 
   if (!user) {
     navigate("/auth");
-    return null;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Перенаправление на страницу авторизации...</p>
+      </div>
+    );
   }
 
   // На данный момент у нас нет реальных заказов, поэтому создадим демо-данные

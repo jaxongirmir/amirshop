@@ -23,7 +23,11 @@ export default function Profile() {
 
   if (!user) {
     navigate("/auth");
-    return null;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Перенаправление на страницу авторизации...</p>
+      </div>
+    );
   }
 
   return (

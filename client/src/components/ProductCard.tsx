@@ -76,9 +76,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
   
   // Парсим доступные размеры из JSON
-  const availableSizes = Array.isArray(product.availableSizes) 
+  const availableSizes: string[] = Array.isArray(product.availableSizes) 
     ? product.availableSizes 
-    : JSON.parse(product.availableSizes as unknown as string) || [];
+    : typeof product.availableSizes === 'string' 
+      ? JSON.parse(product.availableSizes) 
+      : [];
   
   const goToProductPage = () => {
     navigate(`/product/${product.id}`);
@@ -116,7 +118,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mb-4">
           <p className="font-medium text-sm mb-2">Выберите размер:</p>
           <div className="flex flex-wrap gap-2">
-            {availableSizes.map((size) => (
+            {availableSizes.map((size: string) => (
               <button
                 key={size}
                 className={`size-button ${
