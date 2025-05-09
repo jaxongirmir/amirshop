@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "../contexts/CartContext";
 import { useFavorites } from "../contexts/FavoritesContext";
+import { useAuth } from "@/hooks/use-auth";
 import { Product } from "@shared/schema";
 
 interface ProductCardProps {
@@ -13,19 +14,33 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { toast } = useToast();
   const { addToCart } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { user } = useAuth();
   const [, navigate] = useLocation();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [isFavorited, setIsFavorited] = useState(false);
   
-  // Format price from cents to dollars
+  // Проверяем, есть ли товар в избранном при загрузке
+  useEffect(() => {
+    if (user) {
+      setIsFavorited(isFavorite(product.id));
+    }
+  }, [user, product.id, isFavorite]);
+  
+  // Форматируем цену из копеек в рубли
   const formattedPrice = (price: number) => {
-    return `$${(price / 100).toFixed(2)}`;
+    return `₽${(price / 100).toFixed(2)}`;
   };
   
   const handleAddToCart = () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    
     if (!selectedSize) {
       toast({
-        title: "Size required",
-        description: "Please select a size before adding to cart",
+        title: "Требуется размер",
+        description: "Пожалуйста, выберите размер перед добавлением в корзину",
         variant: "destructive",
       });
       return;
@@ -38,26 +53,32 @@ export default function ProductCard({ product }: ProductCardProps) {
     });
     
     toast({
-      title: "Added to cart",
-      description: `${product.name} (${selectedSize}) added to your cart`,
+      title: "Добавлено в корзину",
+      description: `${product.name} (${selectedSize}) добавлен в вашу корзину`,
     });
   };
   
   const handleToggleFavorite = () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    
     toggleFavorite(product.id);
+    setIsFavorited(!isFavorited);
     
     toast({
-      title: isFavorite(product.id) ? "Removed from favorites" : "Added to favorites",
-      description: isFavorite(product.id) 
-        ? `${product.name} removed from your favorites` 
-        : `${product.name} added to your favorites`,
+      title: isFavorited ? "Удалено из избранного" : "Добавлено в избранное",
+      description: isFavorited 
+        ? `${product.name} удален из избранного` 
+        : `${product.name} добавлен в избранное`,
     });
   };
   
-  // Parse the available sizes from JSON
+  // Парсим доступные размеры из JSON
   const availableSizes = Array.isArray(product.availableSizes) 
     ? product.availableSizes 
-    : [];
+    : JSON.parse(product.availableSizes as unknown as string) || [];
   
   const goToProductPage = () => {
     navigate(`/product/${product.id}`);
@@ -76,7 +97,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
           onClick={handleToggleFavorite}
         >
-          <i className={`${isFavorite(product.id) ? 'fas text-secondary' : 'far text-gray-600 hover:text-secondary'} fa-heart`}></i>
+          <i className={`${isFavorited ? 'fas text-secondary' : 'far text-gray-600 hover:text-secondary'} fa-heart`}></i>
         </button>
       </div>
       
@@ -93,7 +114,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="text-gray-600 text-sm mb-4">{product.description}</p>
         
         <div className="mb-4">
-          <p className="font-medium text-sm mb-2">Select Size:</p>
+          <p className="font-medium text-sm mb-2">Выберите размер:</p>
           <div className="flex flex-wrap gap-2">
             {availableSizes.map((size) => (
               <button
@@ -114,7 +135,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           onClick={handleAddToCart}
         >
           <i className="fas fa-shopping-bag mr-2"></i>
-          Add to Cart
+          Добавить в корзину
         </button>
       </div>
     </div>
