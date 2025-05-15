@@ -4,7 +4,7 @@ import { useCart } from "../contexts/CartContext";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useFilter } from "../contexts/FilterContext";
 import { useAuth } from "@/hooks/use-auth";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import bazayImg from "../../assets/bazay.jpg";
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,85 +21,97 @@ export default function Header() {
   const { favorites } = useFavorites();
   const { setGender } = useFilter();
   const { user, logoutMutation } = useAuth();
-  
+
   // Проверяем состояние аутентификации и обновляем страницу при изменении
   useEffect(() => {
     // Слушаем изменения в состоянии аутентификации
-    console.log("Auth state changed:", user ? `Logged in as ${user.username}` : "Not logged in");
+    console.log(
+      "Auth state changed:",
+      user ? `Logged in as ${user.username}` : "Not logged in"
+    );
   }, [user]);
-  
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       // Update filter context with search query
-      setGender('all');
+      setGender("all");
       navigate(`/?search=${encodeURIComponent(searchQuery)}`);
     }
   };
-  
+
   const handleCategoryClick = (gender: string) => {
     setGender(gender);
-    navigate('/');
+    navigate("/");
   };
-  
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="text-2xl font-bold text-primary">
-            AmirHub
+            <img src={bazayImg} alt="bazay image" className="logo_img" />
           </Link>
-          
+
           {/* Search Bar */}
-          <div className="hidden md:block w-1/3">
+          {/* <div className="hidden md:block w-1/3">
             <form onSubmit={handleSearch} className="relative">
-              <input 
-                type="text" 
-                placeholder="Поиск товаров..." 
+              <input
+                type="text"
+                placeholder="Поиск товаров..."
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button type="submit" className="absolute left-3 top-2.5 text-gray-400">
+              <button
+                type="submit"
+                className="absolute left-3 top-2.5 text-gray-400"
+              >
                 <i className="fas fa-search"></i>
               </button>
             </form>
-          </div>
-          
+          </div> */}
+
           {/* Navigation Links */}
           <nav className="flex items-center space-x-6">
             <button
-              onClick={() => handleCategoryClick('men')}
+              onClick={() => handleCategoryClick("men")}
               className={`text-gray-700 hover:text-accent transition-colors duration-200 ${
-                location === '/' && useFilter().gender === 'men' ? 'text-accent' : ''
+                location === "/" && useFilter().gender === "men"
+                  ? "text-accent"
+                  : ""
               }`}
             >
               Мужчинам
             </button>
             <button
-              onClick={() => handleCategoryClick('women')}
+              onClick={() => handleCategoryClick("women")}
               className={`text-gray-700 hover:text-accent transition-colors duration-200 ${
-                location === '/' && useFilter().gender === 'women' ? 'text-accent' : ''
+                location === "/" && useFilter().gender === "women"
+                  ? "text-accent"
+                  : ""
               }`}
             >
               Женщинам
             </button>
-            <Link href="/favorites" className="relative text-gray-700 hover:text-accent transition-colors duration-200">
+            <Link
+              href="/favorites"
+              className="relative text-gray-700 hover:text-accent transition-colors duration-200"
+            >
               <i className="far fa-heart text-xl"></i>
               {favorites.length > 0 && (
-                <span className="badge">
-                  {favorites.length}
-                </span>
+                <span className="badge">{favorites.length}</span>
               )}
             </Link>
 
-            <Link href="/cart" className="relative text-gray-700 hover:text-accent transition-colors duration-200">
+            <Link
+              href="/cart"
+              className="relative text-gray-700 hover:text-accent transition-colors duration-200"
+            >
               <i className="fas fa-shopping-bag text-xl"></i>
               {cartItems.length > 0 && (
-                <span className="badge">
-                  {cartItems.length}
-                </span>
+                <span className="badge">{cartItems.length}</span>
               )}
             </Link>
             {user ? (
@@ -123,7 +136,10 @@ export default function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/auth" className="hidden md:block text-gray-700 hover:text-accent transition-colors duration-200">
+              <Link
+                href="/auth"
+                className="hidden md:block text-gray-700 hover:text-accent transition-colors duration-200"
+              >
                 <i className="far fa-user text-xl mr-1"></i>
                 <span className="text-sm">Войти</span>
               </Link>
@@ -132,7 +148,7 @@ export default function Header() {
         </div>
 
         {/* Mobile Search Bar */}
-        <div className="md:hidden pb-4">
+        {/* <div className="md:hidden pb-4">
           <form onSubmit={handleSearch} className="relative">
             <input 
               type="text" 
@@ -145,7 +161,7 @@ export default function Header() {
               <i className="fas fa-search"></i>
             </button>
           </form>
-        </div>
+        </div> */}
       </div>
     </header>
   );

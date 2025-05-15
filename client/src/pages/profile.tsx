@@ -9,20 +9,20 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { 
-  Loader2, 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  CreditCard, 
-  Edit, 
+import {
+  Loader2,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  CreditCard,
+  Edit,
   Save,
   Clock,
   Heart,
   ShoppingBag,
   Star,
-  MessageSquare
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +31,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useFavorites } from "@/contexts/FavoritesContext";
 
@@ -42,11 +48,11 @@ export default function Profile() {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
-  
+
   // Загружаем данные из localStorage, если они есть
   const getSavedProfile = () => {
     try {
-      const savedProfile = localStorage.getItem('userProfile');
+      const savedProfile = localStorage.getItem("userProfile");
       if (savedProfile) {
         const profile = JSON.parse(savedProfile);
         // Проверяем, принадлежит ли профиль текущему пользователю
@@ -57,7 +63,7 @@ export default function Profile() {
     } catch (e) {
       console.error("Ошибка при загрузке профиля:", e);
     }
-    
+
     // Дефолтные данные, если нет сохраненного профиля
     return {
       username: user ? user.username : "",
@@ -69,35 +75,37 @@ export default function Profile() {
       postalCode: "",
       country: "Россия",
       bio: "",
-      notifications: true
+      notifications: true,
     };
   };
-  
+
   // Form state
   const [formData, setFormData] = useState(getSavedProfile());
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
-  
+
   const handleSwitchChange = (checked: boolean) => {
     setFormData({
       ...formData,
-      notifications: checked
+      notifications: checked,
     });
   };
-  
+
   const handleSelectChange = (name: string, value: string) => {
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
-  
+
   const handleSave = () => {
     // К этой функции мы никогда не дойдем, если пользователь не авторизован,
     // так как выше есть проверка на user и возврат из компонента.
@@ -106,19 +114,22 @@ export default function Profile() {
 
     // Здесь будет вызов API для сохранения данных в реальном приложении
     setIsEditing(false);
-    
+
     // Для демонстрации, сохраняем данные в localStorage
-    localStorage.setItem('userProfile', JSON.stringify({
-      ...formData,
-      userId: user.id,
-      username: user.username
-    }));
-    
+    localStorage.setItem(
+      "userProfile",
+      JSON.stringify({
+        ...formData,
+        userId: user.id,
+        username: user.username,
+      })
+    );
+
     toast({
       title: "Профиль обновлен",
       description: "Ваши данные успешно сохранены",
     });
-    
+
     // Добавляем небольшую задержку, чтобы пользователь увидел изменения
     setTimeout(() => {
       window.location.reload();
@@ -145,7 +156,7 @@ export default function Profile() {
   return (
     <div className="container mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-8">Личный кабинет</h1>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar */}
         <Card className="lg:col-span-1 h-fit">
@@ -160,34 +171,34 @@ export default function Profile() {
               <h2 className="text-xl font-bold">{user.username}</h2>
               <p className="text-gray-500">Клиент</p>
             </div>
-            
+
             <div className="space-y-2">
-              <Button 
-                variant={activeTab === "profile" ? "default" : "ghost"} 
-                className="w-full justify-start" 
+              <Button
+                variant={activeTab === "profile" ? "default" : "ghost"}
+                className="w-full justify-start"
                 onClick={() => setActiveTab("profile")}
               >
                 <User className="mr-2 h-4 w-4" />
                 Профиль
               </Button>
-              <Button 
+              {/* <Button 
                 variant={activeTab === "addresses" ? "default" : "ghost"} 
                 className="w-full justify-start"
                 onClick={() => setActiveTab("addresses")}
               >
                 <MapPin className="mr-2 h-4 w-4" />
                 Адреса доставки
-              </Button>
-              <Button 
-                variant={activeTab === "orders" ? "default" : "ghost"} 
+              </Button> */}
+              <Button
+                variant={activeTab === "orders" ? "default" : "ghost"}
                 className="w-full justify-start"
                 onClick={() => navigate("/orders")}
               >
                 <ShoppingBag className="mr-2 h-4 w-4" />
                 История заказов
               </Button>
-              <Button 
-                variant={activeTab === "favorites" ? "default" : "ghost"} 
+              <Button
+                variant={activeTab === "favorites" ? "default" : "ghost"}
                 className="w-full justify-start"
                 onClick={() => navigate("/favorites")}
               >
@@ -199,11 +210,10 @@ export default function Profile() {
                   </span>
                 )}
               </Button>
-
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Main Content */}
         <div className="lg:col-span-3">
           {activeTab === "profile" && (
@@ -211,12 +221,16 @@ export default function Profile() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>Личная информация</CardTitle>
-                  <CardDescription>Управление вашими персональными данными</CardDescription>
+                  <CardDescription>
+                    Управление вашими персональными данными
+                  </CardDescription>
                 </div>
-                <Button 
+                <Button
                   variant={isEditing ? "default" : "outline"}
                   size="sm"
-                  onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                  onClick={() =>
+                    isEditing ? handleSave() : setIsEditing(true)
+                  }
                 >
                   {isEditing ? (
                     <>
@@ -238,73 +252,81 @@ export default function Profile() {
                       <div className="space-y-2">
                         <Label htmlFor="username">Имя пользователя</Label>
                         {isEditing ? (
-                          <Input 
-                            id="username" 
+                          <Input
+                            id="username"
                             name="username"
-                            value={formData.username} 
+                            value={formData.username}
                             onChange={handleInputChange}
                           />
                         ) : (
-                          <div className="p-2 border rounded-md">{user.username}</div>
+                          <div className="p-2 border rounded-md">
+                            {user.username}
+                          </div>
                         )}
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="fullName">Полное имя</Label>
                         {isEditing ? (
-                          <Input 
-                            id="fullName" 
+                          <Input
+                            id="fullName"
                             name="fullName"
-                            value={formData.fullName} 
+                            value={formData.fullName}
                             onChange={handleInputChange}
                             placeholder="Иванов Иван Иванович"
                           />
                         ) : (
-                          <div className="p-2 border rounded-md">{formData.fullName || "Не указано"}</div>
+                          <div className="p-2 border rounded-md">
+                            {formData.fullName || "Не указано"}
+                          </div>
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="email">Электронная почта</Label>
                         {isEditing ? (
-                          <Input 
-                            id="email" 
+                          <Input
+                            id="email"
                             name="email"
                             type="email"
-                            value={formData.email} 
+                            value={formData.email}
                             onChange={handleInputChange}
                             placeholder="example@mail.ru"
                           />
                         ) : (
-                          <div className="p-2 border rounded-md">{formData.email || "Не указано"}</div>
+                          <div className="p-2 border rounded-md">
+                            {formData.email || "Не указано"}
+                          </div>
                         )}
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="phone">Номер телефона</Label>
                         {isEditing ? (
-                          <Input 
-                            id="phone" 
+                          <Input
+                            id="phone"
                             name="phone"
-                            value={formData.phone} 
+                            value={formData.phone}
                             onChange={handleInputChange}
                             placeholder="+7 (999) 123-45-67"
                           />
                         ) : (
-                          <div className="p-2 border rounded-md">{formData.phone || "Не указано"}</div>
+                          <div className="p-2 border rounded-md">
+                            {formData.phone || "Не указано"}
+                          </div>
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="bio">О себе</Label>
                       {isEditing ? (
-                        <Textarea 
-                          id="bio" 
+                        <Textarea
+                          id="bio"
                           name="bio"
-                          value={formData.bio} 
+                          value={formData.bio}
                           onChange={handleInputChange}
                           placeholder="Расскажите немного о себе..."
                           rows={4}
@@ -315,15 +337,13 @@ export default function Profile() {
                         </div>
                       )}
                     </div>
-                    
-
                   </div>
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between border-t pt-6">
                 <div className="text-sm text-gray-500">
                   <Clock className="inline-block mr-1 h-4 w-4" />
-                  Регистрация: {new Date().toLocaleDateString('ru-RU')}
+                  Регистрация: {new Date().toLocaleDateString("ru-RU")}
                 </div>
                 {isEditing && (
                   <Button variant="outline" onClick={() => setIsEditing(false)}>
@@ -333,73 +353,83 @@ export default function Profile() {
               </CardFooter>
             </Card>
           )}
-          
+
           {activeTab === "addresses" && (
             <Card>
               <CardHeader>
                 <CardTitle>Адреса доставки</CardTitle>
-                <CardDescription>Управление адресами для доставки</CardDescription>
+                <CardDescription>
+                  Управление адресами для доставки
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   {/* Address Form */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">Основной адрес</h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="address">Адрес</Label>
                         {isEditing ? (
-                          <Input 
-                            id="address" 
+                          <Input
+                            id="address"
                             name="address"
-                            value={formData.address} 
+                            value={formData.address}
                             onChange={handleInputChange}
                             placeholder="ул. Пушкина, д. 10, кв. 5"
                           />
                         ) : (
-                          <div className="p-2 border rounded-md">{formData.address || "Не указано"}</div>
+                          <div className="p-2 border rounded-md">
+                            {formData.address || "Не указано"}
+                          </div>
                         )}
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="city">Город</Label>
                         {isEditing ? (
-                          <Input 
-                            id="city" 
+                          <Input
+                            id="city"
                             name="city"
-                            value={formData.city} 
+                            value={formData.city}
                             onChange={handleInputChange}
                             placeholder="Москва"
                           />
                         ) : (
-                          <div className="p-2 border rounded-md">{formData.city || "Не указано"}</div>
+                          <div className="p-2 border rounded-md">
+                            {formData.city || "Не указано"}
+                          </div>
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="postalCode">Почтовый индекс</Label>
                         {isEditing ? (
-                          <Input 
-                            id="postalCode" 
+                          <Input
+                            id="postalCode"
                             name="postalCode"
-                            value={formData.postalCode} 
+                            value={formData.postalCode}
                             onChange={handleInputChange}
                             placeholder="123456"
                           />
                         ) : (
-                          <div className="p-2 border rounded-md">{formData.postalCode || "Не указано"}</div>
+                          <div className="p-2 border rounded-md">
+                            {formData.postalCode || "Не указано"}
+                          </div>
                         )}
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="country">Страна</Label>
                         {isEditing ? (
                           <Select
                             value={formData.country}
-                            onValueChange={(value) => handleSelectChange("country", value)}
+                            onValueChange={(value) =>
+                              handleSelectChange("country", value)
+                            }
                           >
                             <SelectTrigger id="country">
                               <SelectValue placeholder="Выберите страну" />
@@ -407,16 +437,20 @@ export default function Profile() {
                             <SelectContent>
                               <SelectItem value="Россия">Россия</SelectItem>
                               <SelectItem value="Беларусь">Беларусь</SelectItem>
-                              <SelectItem value="Казахстан">Казахстан</SelectItem>
+                              <SelectItem value="Казахстан">
+                                Казахстан
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         ) : (
-                          <div className="p-2 border rounded-md">{formData.country}</div>
+                          <div className="p-2 border rounded-md">
+                            {formData.country}
+                          </div>
                         )}
                       </div>
                     </div>
                   </div>
-                  
+
                   {isEditing && (
                     <Button variant="outline" className="w-full">
                       <MapPin className="mr-2 h-4 w-4" />
@@ -437,7 +471,7 @@ export default function Profile() {
           )}
         </div>
       </div>
-      
+
       {/* Statistics Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
         <Card>
@@ -451,7 +485,7 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6 flex items-center">
             <div className="bg-primary/10 rounded-full p-3 mr-4">
@@ -463,7 +497,7 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6 flex items-center">
             <div className="bg-primary/10 rounded-full p-3 mr-4">
@@ -475,7 +509,7 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6 flex items-center">
             <div className="bg-primary/10 rounded-full p-3 mr-4">

@@ -11,7 +11,17 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, Package, CheckCircle, Clock, ShoppingBag, User, MapPin, Heart, X } from "lucide-react";
+import {
+  Loader2,
+  Package,
+  CheckCircle,
+  Clock,
+  ShoppingBag,
+  User,
+  MapPin,
+  Heart,
+  X,
+} from "lucide-react";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -46,18 +56,18 @@ export default function Orders() {
   const { favorites } = useFavorites();
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("orders");
-  
+
   // Загружаем заказы из localStorage
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
-  
+
   const { toast } = useToast();
-  
+
   // Загрузка заказов при монтировании
   useEffect(() => {
     try {
-      const savedOrders = localStorage.getItem('orderHistory');
+      const savedOrders = localStorage.getItem("orderHistory");
       if (savedOrders) {
         const parsedOrders = JSON.parse(savedOrders);
         // Если есть заказы, устанавливаем их
@@ -66,7 +76,7 @@ export default function Orders() {
           return;
         }
       }
-      
+
       // Если нет сохраненных заказов, используем демо-данные
       setOrders([
         {
@@ -84,16 +94,14 @@ export default function Orders() {
           date: "03.06.2023",
           total: 5800,
           status: "В пути",
-          items: [
-            { name: "Кроссовки спортивные", price: 5800, quantity: 1 },
-          ],
+          items: [{ name: "Кроссовки спортивные", price: 5800, quantity: 1 }],
         },
       ]);
     } catch (error) {
-      console.error('Ошибка при загрузке истории заказов:', error);
+      console.error("Ошибка при загрузке истории заказов:", error);
     }
   }, []);
-  
+
   // Функция для повторного заказа
   const handleRepeatOrder = (order: Order) => {
     // В реальном приложении здесь было бы добавление товаров в корзину
@@ -102,13 +110,13 @@ export default function Orders() {
       title: "Создаем заказ",
       description: "Добавляем товары в корзину...",
     });
-    
+
     // Перенаправляем на главную страницу (в реальном приложении - в корзину)
     setTimeout(() => {
       navigate("/");
     }, 1500);
   };
-  
+
   // Функция для показа деталей заказа
   const showDetails = (order: Order) => {
     setSelectedOrder(order);
@@ -148,7 +156,7 @@ export default function Orders() {
   return (
     <div className="container mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-8">Личный кабинет</h1>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar */}
         <Card className="lg:col-span-1 h-fit">
@@ -163,34 +171,34 @@ export default function Orders() {
               <h2 className="text-xl font-bold">{user.username}</h2>
               <p className="text-gray-500">Клиент</p>
             </div>
-            
+
             <div className="space-y-2">
-              <Button 
-                variant={activeTab === "profile" ? "default" : "ghost"} 
-                className="w-full justify-start" 
+              <Button
+                variant={activeTab === "profile" ? "default" : "ghost"}
+                className="w-full justify-start"
                 onClick={() => navigate("/profile")}
               >
                 <User className="mr-2 h-4 w-4" />
                 Профиль
               </Button>
-              <Button 
+              {/* <Button 
                 variant={activeTab === "addresses" ? "default" : "ghost"} 
                 className="w-full justify-start"
                 onClick={() => navigate("/profile")}
               >
                 <MapPin className="mr-2 h-4 w-4" />
                 Адреса доставки
-              </Button>
-              <Button 
-                variant={activeTab === "orders" ? "default" : "ghost"} 
+              </Button> */}
+              <Button
+                variant={activeTab === "orders" ? "default" : "ghost"}
                 className="w-full justify-start"
                 onClick={() => setActiveTab("orders")}
               >
                 <ShoppingBag className="mr-2 h-4 w-4" />
                 История заказов
               </Button>
-              <Button 
-                variant={activeTab === "favorites" ? "default" : "ghost"} 
+              <Button
+                variant={activeTab === "favorites" ? "default" : "ghost"}
                 className="w-full justify-start"
                 onClick={() => navigate("/favorites")}
               >
@@ -205,18 +213,20 @@ export default function Orders() {
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Main Content */}
         <div className="lg:col-span-3">
           <h2 className="text-2xl font-bold mb-6">История заказов</h2>
-          
+
           {orders.length > 0 ? (
             <div className="space-y-6">
               {orders.map((order) => (
                 <Card key={order.id}>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl">Заказ {order.id}</CardTitle>
+                      <CardTitle className="text-xl">
+                        Заказ {order.id}
+                      </CardTitle>
                       <CardDescription>от {order.date}</CardDescription>
                     </div>
                     <div className="flex items-center">
@@ -238,25 +248,42 @@ export default function Orders() {
                           </thead>
                           <tbody>
                             {order.items.map((item, index) => (
-                              <tr key={index} className="border-t border-gray-200">
+                              <tr
+                                key={index}
+                                className="border-t border-gray-200"
+                              >
                                 <td className="py-3">{item.name}</td>
-                                <td className="py-3 text-right">{item.price} ₽</td>
-                                <td className="py-3 text-right">{item.quantity}</td>
-                                <td className="py-3 text-right">{item.price * item.quantity} ₽</td>
+                                <td className="py-3 text-right">
+                                  {item.price} ₽
+                                </td>
+                                <td className="py-3 text-right">
+                                  {item.quantity}
+                                </td>
+                                <td className="py-3 text-right">
+                                  {item.price * item.quantity} ₽
+                                </td>
                               </tr>
                             ))}
                           </tbody>
                           <tfoot>
                             <tr className="border-t border-gray-200 font-semibold">
-                              <td colSpan={3} className="pt-3 text-right">Итого:</td>
-                              <td className="pt-3 text-right">{order.total} ₽</td>
+                              <td colSpan={3} className="pt-3 text-right">
+                                Итого:
+                              </td>
+                              <td className="pt-3 text-right">
+                                {order.total} ₽
+                              </td>
                             </tr>
                           </tfoot>
                         </table>
                       </div>
-                      
+
                       <div className="flex justify-end">
-                        <Button variant="outline" className="mr-2" onClick={() => showDetails(order)}>
+                        <Button
+                          variant="outline"
+                          className="mr-2"
+                          onClick={() => showDetails(order)}
+                        >
                           Детали заказа
                         </Button>
                         <Button onClick={() => handleRepeatOrder(order)}>
@@ -272,7 +299,9 @@ export default function Orders() {
             <Card>
               <CardContent className="py-8 text-center">
                 <ShoppingBag className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">У вас пока нет заказов</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  У вас пока нет заказов
+                </h3>
                 <p className="text-gray-500 mb-4">
                   Как только вы сделаете свой первый заказ, он появится здесь
                 </p>
@@ -282,7 +311,7 @@ export default function Orders() {
               </CardContent>
             </Card>
           )}
-          
+
           {/* Модальное окно с деталями заказа */}
           {showOrderDetails && selectedOrder && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -292,7 +321,11 @@ export default function Orders() {
                     <CardTitle>Детали заказа {selectedOrder.id}</CardTitle>
                     <CardDescription>от {selectedOrder.date}</CardDescription>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => setShowOrderDetails(false)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowOrderDetails(false)}
+                  >
                     <X className="h-4 w-4" />
                   </Button>
                 </CardHeader>
@@ -302,7 +335,9 @@ export default function Orders() {
                     <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                       <div className="flex items-center">
                         {getStatusIcon(selectedOrder.status)}
-                        <span className="ml-2 font-medium">{selectedOrder.status}</span>
+                        <span className="ml-2 font-medium">
+                          {selectedOrder.status}
+                        </span>
                       </div>
                       {selectedOrder.status === "Доставлен" && (
                         <div className="text-sm text-muted-foreground">
@@ -310,7 +345,7 @@ export default function Orders() {
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Информация о заказе */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">Товары в заказе</h3>
@@ -326,61 +361,103 @@ export default function Orders() {
                           </thead>
                           <tbody>
                             {selectedOrder.items.map((item, index) => (
-                              <tr key={index} className="border-t border-gray-200">
+                              <tr
+                                key={index}
+                                className="border-t border-gray-200"
+                              >
                                 <td className="py-3">{item.name}</td>
-                                <td className="py-3 text-right">{item.price} ₽</td>
-                                <td className="py-3 text-right">{item.quantity}</td>
-                                <td className="py-3 text-right">{item.price * item.quantity} ₽</td>
+                                <td className="py-3 text-right">
+                                  {item.price} ₽
+                                </td>
+                                <td className="py-3 text-right">
+                                  {item.quantity}
+                                </td>
+                                <td className="py-3 text-right">
+                                  {item.price * item.quantity} ₽
+                                </td>
                               </tr>
                             ))}
                           </tbody>
                           <tfoot>
                             <tr className="border-t border-gray-200">
-                              <td colSpan={3} className="pt-3 text-right">Товары:</td>
-                              <td className="pt-3 text-right">{selectedOrder.total - (selectedOrder.deliveryCost || 0)} ₽</td>
+                              <td colSpan={3} className="pt-3 text-right">
+                                Товары:
+                              </td>
+                              <td className="pt-3 text-right">
+                                {selectedOrder.total -
+                                  (selectedOrder.deliveryCost || 0)}{" "}
+                                ₽
+                              </td>
                             </tr>
                             {selectedOrder.deliveryCost && (
                               <tr>
-                                <td colSpan={3} className="pt-1 text-right">Доставка:</td>
-                                <td className="pt-1 text-right">{selectedOrder.deliveryCost} ₽</td>
+                                <td colSpan={3} className="pt-1 text-right">
+                                  Доставка:
+                                </td>
+                                <td className="pt-1 text-right">
+                                  {selectedOrder.deliveryCost} ₽
+                                </td>
                               </tr>
                             )}
                             <tr className="border-t border-gray-200 font-semibold">
-                              <td colSpan={3} className="pt-3 text-right">Итого:</td>
-                              <td className="pt-3 text-right">{selectedOrder.total} ₽</td>
+                              <td colSpan={3} className="pt-3 text-right">
+                                Итого:
+                              </td>
+                              <td className="pt-3 text-right">
+                                {selectedOrder.total} ₽
+                              </td>
                             </tr>
                           </tfoot>
                         </table>
                       </div>
-                      
+
                       {/* Информация о доставке */}
                       {selectedOrder.shippingAddress && (
                         <div className="space-y-2">
-                          <h3 className="text-lg font-semibold">Адрес доставки</h3>
+                          <h3 className="text-lg font-semibold">
+                            Адрес доставки
+                          </h3>
                           <div className="p-4 bg-muted rounded-lg">
-                            <p className="font-medium">{selectedOrder.shippingAddress.fullName}</p>
+                            <p className="font-medium">
+                              {selectedOrder.shippingAddress.fullName}
+                            </p>
                             <p>{selectedOrder.shippingAddress.address}</p>
-                            <p>{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.postalCode}</p>
+                            <p>
+                              {selectedOrder.shippingAddress.city},{" "}
+                              {selectedOrder.shippingAddress.postalCode}
+                            </p>
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Способ оплаты и доставки */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {selectedOrder.paymentMethod && (
                           <div className="space-y-2">
-                            <h3 className="text-lg font-semibold">Способ оплаты</h3>
+                            <h3 className="text-lg font-semibold">
+                              Способ оплаты
+                            </h3>
                             <div className="p-4 bg-muted rounded-lg">
-                              <p>{selectedOrder.paymentMethod === "card" ? "Банковская карта" : "Наличные при получении"}</p>
+                              <p>
+                                {selectedOrder.paymentMethod === "card"
+                                  ? "Банковская карта"
+                                  : "Наличные при получении"}
+                              </p>
                             </div>
                           </div>
                         )}
-                        
+
                         {selectedOrder.deliveryMethod && (
                           <div className="space-y-2">
-                            <h3 className="text-lg font-semibold">Способ доставки</h3>
+                            <h3 className="text-lg font-semibold">
+                              Способ доставки
+                            </h3>
                             <div className="p-4 bg-muted rounded-lg">
-                              <p>{selectedOrder.deliveryMethod === "express" ? "Экспресс-доставка" : "Стандартная доставка"}</p>
+                              <p>
+                                {selectedOrder.deliveryMethod === "express"
+                                  ? "Экспресс-доставка"
+                                  : "Стандартная доставка"}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -389,13 +466,18 @@ export default function Orders() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2 border-t p-4">
-                  <Button variant="outline" onClick={() => setShowOrderDetails(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowOrderDetails(false)}
+                  >
                     Закрыть
                   </Button>
-                  <Button onClick={() => {
-                    handleRepeatOrder(selectedOrder);
-                    setShowOrderDetails(false);
-                  }}>
+                  <Button
+                    onClick={() => {
+                      handleRepeatOrder(selectedOrder);
+                      setShowOrderDetails(false);
+                    }}
+                  >
                     Повторить заказ
                   </Button>
                 </CardFooter>
