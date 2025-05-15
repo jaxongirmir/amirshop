@@ -171,14 +171,7 @@ export default function Profile() {
                   </span>
                 )}
               </Button>
-              <Button 
-                variant={activeTab === "notifications" ? "default" : "ghost"} 
-                className="w-full justify-start"
-                onClick={() => navigate("/notifications")}
-              >
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Уведомления
-              </Button>
+
             </div>
           </CardContent>
         </Card>
@@ -295,17 +288,7 @@ export default function Profile() {
                       )}
                     </div>
                     
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="notifications">Получать уведомления</Label>
-                        <Switch 
-                          id="notifications" 
-                          checked={formData.notifications}
-                          onCheckedChange={handleSwitchChange}
-                          disabled={!isEditing}
-                        />
-                      </div>
-                    </div>
+
                   </div>
                 </div>
               </CardContent>
