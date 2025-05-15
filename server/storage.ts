@@ -363,8 +363,315 @@ async function setupDatabase() {
   }
 }
 
-// Export storage instance
-export const storage = new DatabaseStorage();
+// In-memory storage implementation
+class MemStorage implements IStorage {
+  private users: User[] = [];
+  private products: Product[] = [];
+  private cartItems: CartItem[] = [];
+  private favoritesItems: Favorite[] = [];
+  private notificationItems: Notification[] = [];
+  private userId = 1;
+  private productId = 1;
+  private cartItemId = 1;
+  private favoriteId = 1;
+  private notificationId = 1;
 
-// Setup database on server start
-setupDatabase().catch(console.error);
+  constructor() {
+    // Initialize with mock data
+    this.initMockData();
+  }
+
+  private initMockData() {
+    // Create demo user
+    this.users.push({
+      id: this.userId++,
+      username: "demo",
+      password: "$2a$10$ZFVX8kyQYoHp1Yzq3D9MXuJK8BkbvBEI/GK30c73gVuTK5KBj5aeS", // hashed "password123"
+    });
+
+    // Add sample products
+    const productsData: InsertProduct[] = [
+      {
+        name: "Summer Floral Dress",
+        price: 5999, // $59.99
+        description: "Elegant white summer dress with floral pattern",
+        imageUrl: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=800&q=80",
+        category: "dresses",
+        gender: "women",
+        availableSizes: ["XS", "S", "M", "L", "XL"],
+      },
+      {
+        name: "Denim Casual Shirt",
+        price: 4599, // $45.99
+        description: "Classic denim shirt for a casual look",
+        imageUrl: "https://images.unsplash.com/photo-1589310243389-96a5483213a8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=800&q=80",
+        category: "shirts",
+        gender: "men",
+        availableSizes: ["S", "M", "L", "XL", "2XL"],
+      },
+      {
+        name: "Leather Biker Jacket",
+        price: 8999, // $89.99
+        description: "Premium black leather jacket for a bold look",
+        imageUrl: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=800&q=80",
+        category: "jackets",
+        gender: "women",
+        availableSizes: ["S", "M", "L"],
+      },
+      {
+        name: "Classic White Sneakers",
+        price: 6599, // $65.99
+        description: "Comfortable casual sneakers for everyday wear",
+        imageUrl: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=800&q=80",
+        category: "shoes",
+        gender: "men",
+        availableSizes: ["40", "41", "42", "43", "44", "45"],
+      },
+      {
+        name: "Slim Fit T-Shirt",
+        price: 2499, // $24.99
+        description: "Comfortable slim fit t-shirt for everyday wear",
+        imageUrl: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=800&q=80",
+        category: "tshirts",
+        gender: "men",
+        availableSizes: ["S", "M", "L", "XL"],
+      },
+      {
+        name: "High Waist Jeans",
+        price: 3999, // $39.99
+        description: "Stylish high waist jeans for a modern look",
+        imageUrl: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=800&q=80",
+        category: "pants",
+        gender: "women",
+        availableSizes: ["XS", "S", "M", "L"],
+      },
+      {
+        name: "Wool Winter Coat",
+        price: 11999, // $119.99
+        description: "Warm wool coat perfect for winter season",
+        imageUrl: "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=800&q=80",
+        category: "coats",
+        gender: "women",
+        availableSizes: ["S", "M", "L", "XL"],
+      },
+      {
+        name: "Chino Pants",
+        price: 3499, // $34.99
+        description: "Classic chino pants for casual and formal occasions",
+        imageUrl: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=800&q=80",
+        category: "pants",
+        gender: "men",
+        availableSizes: ["30", "32", "34", "36", "38"],
+      },
+    ];
+
+    for (const product of productsData) {
+      this.products.push({
+        ...product,
+        id: this.productId++
+      });
+    }
+
+    // Add initial notification for demo user
+    this.notificationItems.push({
+      id: this.notificationId++,
+      userId: 1,
+      message: "Welcome to AmirHub! Explore our new summer collection.",
+      read: false,
+    });
+  }
+
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.find(user => user.id === id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return this.users.find(user => user.username === username);
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const newUser: User = {
+      ...insertUser,
+      id: this.userId++
+    };
+    this.users.push(newUser);
+    return newUser;
+  }
+
+  // Product methods
+  async getProducts(): Promise<Product[]> {
+    return [...this.products];
+  }
+
+  async getProductById(id: number): Promise<Product | undefined> {
+    return this.products.find(product => product.id === id);
+  }
+
+  async getProductsByCategory(category: string): Promise<Product[]> {
+    return this.products.filter(product => product.category === category);
+  }
+
+  async getProductsByGender(gender: string): Promise<Product[]> {
+    return this.products.filter(product => product.gender === gender);
+  }
+
+  async getProductsByCategoryAndGender(category: string, gender: string): Promise<Product[]> {
+    return this.products.filter(
+      product => product.category === category && product.gender === gender
+    );
+  }
+
+  async searchProducts(query: string): Promise<Product[]> {
+    const lowercaseQuery = query.toLowerCase();
+    return this.products.filter(product => 
+      product.name.toLowerCase().includes(lowercaseQuery) ||
+      product.description.toLowerCase().includes(lowercaseQuery) ||
+      product.category.toLowerCase().includes(lowercaseQuery)
+    );
+  }
+
+  // Cart methods
+  async getCartItems(userId: number): Promise<CartItem[]> {
+    return this.cartItems.filter(item => item.userId === userId);
+  }
+
+  async getCartItemWithDetails(userId: number): Promise<(CartItem & { product: Product })[]> {
+    const items = this.cartItems.filter(item => item.userId === userId);
+    const result: (CartItem & { product: Product })[] = [];
+
+    for (const item of items) {
+      const product = this.products.find(p => p.id === item.productId);
+      if (product) {
+        result.push({ ...item, product });
+      }
+    }
+
+    return result;
+  }
+
+  async addToCart(insertCartItem: InsertCartItem): Promise<CartItem> {
+    // Check if item already exists with same size
+    const existingItem = this.cartItems.find(
+      item => item.userId === insertCartItem.userId 
+        && item.productId === insertCartItem.productId 
+        && item.size === insertCartItem.size
+    );
+
+    if (existingItem) {
+      // Update quantity
+      existingItem.quantity += insertCartItem.quantity;
+      return existingItem;
+    }
+
+    // Create new cart item
+    const newItem: CartItem = {
+      ...insertCartItem,
+      id: this.cartItemId++
+    };
+    this.cartItems.push(newItem);
+    return newItem;
+  }
+
+  async updateCartItem(id: number, quantity: number): Promise<CartItem | undefined> {
+    const item = this.cartItems.find(item => item.id === id);
+    if (item) {
+      item.quantity = quantity;
+      return item;
+    }
+    return undefined;
+  }
+
+  async removeFromCart(id: number): Promise<boolean> {
+    const index = this.cartItems.findIndex(item => item.id === id);
+    if (index !== -1) {
+      this.cartItems.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  // Favorites methods
+  async getFavorites(userId: number): Promise<Favorite[]> {
+    return this.favoritesItems.filter(fav => fav.userId === userId);
+  }
+
+  async getFavoritesWithDetails(userId: number): Promise<(Favorite & { product: Product })[]> {
+    const favs = this.favoritesItems.filter(fav => fav.userId === userId);
+    const result: (Favorite & { product: Product })[] = [];
+
+    for (const fav of favs) {
+      const product = this.products.find(p => p.id === fav.productId);
+      if (product) {
+        result.push({ ...fav, product });
+      }
+    }
+
+    return result;
+  }
+
+  async addToFavorites(insertFavorite: InsertFavorite): Promise<Favorite> {
+    // Check if already in favorites
+    const existingFav = this.favoritesItems.find(
+      fav => fav.userId === insertFavorite.userId 
+        && fav.productId === insertFavorite.productId
+    );
+
+    if (existingFav) {
+      return existingFav;
+    }
+
+    const newFav: Favorite = {
+      ...insertFavorite,
+      id: this.favoriteId++
+    };
+    this.favoritesItems.push(newFav);
+    return newFav;
+  }
+
+  async removeFromFavorites(userId: number, productId: number): Promise<boolean> {
+    const index = this.favoritesItems.findIndex(
+      fav => fav.userId === userId && fav.productId === productId
+    );
+    if (index !== -1) {
+      this.favoritesItems.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  // Notifications methods
+  async getNotifications(userId: number): Promise<Notification[]> {
+    return this.notificationItems.filter(n => n.userId === userId);
+  }
+
+  async addNotification(insertNotification: InsertNotification): Promise<Notification> {
+    const newNotification: Notification = {
+      ...insertNotification,
+      id: this.notificationId++
+    };
+    this.notificationItems.push(newNotification);
+    return newNotification;
+  }
+
+  async markNotificationAsRead(id: number): Promise<Notification | undefined> {
+    const notification = this.notificationItems.find(n => n.id === id);
+    if (notification) {
+      notification.read = true;
+      return notification;
+    }
+    return undefined;
+  }
+
+  async deleteNotification(id: number): Promise<boolean> {
+    const index = this.notificationItems.findIndex(n => n.id === id);
+    if (index !== -1) {
+      this.notificationItems.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+}
+
+// Export storage instance
+export const storage = new MemStorage();
