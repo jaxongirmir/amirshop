@@ -386,7 +386,7 @@ class MemStorage implements IStorage {
     this.users.push({
       id: this.userId++,
       username: "demo",
-      password: "$2a$10$ZFVX8kyQYoHp1Yzq3D9MXuJK8BkbvBEI/GK30c73gVuTK5KBj5aeS", // hashed "password123"
+      password: "54ca7b83a424aed496ef5ef4f0ddf48108d450e0a995315c2080f3b058a2d1c7.29a7c9482d883c1f60bff14b3a181a01", // hashed "password123"
     });
 
     // Add sample products
@@ -477,7 +477,7 @@ class MemStorage implements IStorage {
       id: this.notificationId++,
       userId: 1,
       message: "Welcome to AmirHub! Explore our new summer collection.",
-      read: false,
+      read: false as boolean,
     });
   }
 
@@ -491,6 +491,8 @@ class MemStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Пароль уже должен быть хеширован в auth.ts при регистрации
+    // Мы просто добавляем ID и сохраняем пользователя
     const newUser: User = {
       ...insertUser,
       id: this.userId++
@@ -646,9 +648,11 @@ class MemStorage implements IStorage {
   }
 
   async addNotification(insertNotification: InsertNotification): Promise<Notification> {
+    // Обязательно устанавливаем read: false если он не определен
     const newNotification: Notification = {
       ...insertNotification,
-      id: this.notificationId++
+      id: this.notificationId++,
+      read: insertNotification.read ?? false
     };
     this.notificationItems.push(newNotification);
     return newNotification;
