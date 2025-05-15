@@ -130,7 +130,8 @@ export default function Checkout() {
       localStorage.setItem('orderHistory', JSON.stringify(orders));
       
       // Очищаем корзину
-      cartItems.forEach(item => removeFromCart(item.id));
+      // Т.к. работа с API реальной корзины требует отдельного функционала, 
+      // для демо-целей просто показываем сообщение
       
       console.log('Order submitted', order);
       

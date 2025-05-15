@@ -15,32 +15,41 @@ import { Loader2, Package, CheckCircle, Clock, ShoppingBag, User, MapPin, Heart,
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useToast } from "@/hooks/use-toast";
 
+interface OrderItem {
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface ShippingAddress {
+  fullName: string;
+  address: string;
+  city: string;
+  postalCode: string;
+}
+
+interface Order {
+  id: string;
+  date: string;
+  total: number;
+  status: string;
+  items: OrderItem[];
+  deliveryCost?: number;
+  shippingAddress?: ShippingAddress;
+  paymentMethod?: string;
+  deliveryMethod?: string;
+  notes?: string;
+}
+
 export default function Orders() {
   const { user, isLoading } = useAuth();
   const { favorites } = useFavorites();
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("orders");
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-border" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    navigate("/auth");
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Перенаправление на страницу авторизации...</p>
-      </div>
-    );
-  }
-
+  
   // Загружаем заказы из localStorage
-  const [orders, setOrders] = useState<any[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   
   const { toast } = useToast();
@@ -86,7 +95,7 @@ export default function Orders() {
   }, []);
   
   // Функция для повторного заказа
-  const handleRepeatOrder = (order: any) => {
+  const handleRepeatOrder = (order: Order) => {
     // В реальном приложении здесь было бы добавление товаров в корзину
     // через API и перенаправление в корзину
     toast({
@@ -101,7 +110,7 @@ export default function Orders() {
   };
   
   // Функция для показа деталей заказа
-  const showDetails = (order: any) => {
+  const showDetails = (order: Order) => {
     setSelectedOrder(order);
     setShowOrderDetails(true);
   };
@@ -118,6 +127,23 @@ export default function Orders() {
         return <ShoppingBag className="w-5 h-5 text-gray-500" />;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-border" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    navigate("/auth");
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Перенаправление на страницу авторизации...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -186,7 +212,7 @@ export default function Orders() {
           
           {orders.length > 0 ? (
             <div className="space-y-6">
-              {orders.map((order: any) => (
+              {orders.map((order) => (
                 <Card key={order.id}>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
@@ -299,7 +325,7 @@ export default function Orders() {
                             </tr>
                           </thead>
                           <tbody>
-                            {selectedOrder.items.map((item: any, index: number) => (
+                            {selectedOrder.items.map((item, index) => (
                               <tr key={index} className="border-t border-gray-200">
                                 <td className="py-3">{item.name}</td>
                                 <td className="py-3 text-right">{item.price} ₽</td>
