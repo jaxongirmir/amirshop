@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { useCart } from "../contexts/CartContext";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useAuth } from "@/hooks/use-auth";
 import { Product } from "@shared/schema";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductCardProps {
   product: Product;
@@ -12,11 +12,9 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { toast } = useToast();
-  const { addToCart } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { user } = useAuth();
   const [, navigate] = useLocation();
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
   
   // Проверяем, есть ли товар в избранном при загрузке
@@ -25,38 +23,6 @@ export default function ProductCard({ product }: ProductCardProps) {
       setIsFavorited(isFavorite(product.id));
     }
   }, [user, product.id, isFavorite]);
-  
-  // Форматируем цену из копеек в рубли
-  const formattedPrice = (price: number) => {
-    return `₽${(price / 100).toFixed(2)}`;
-  };
-  
-  const handleAddToCart = () => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-    
-    if (!selectedSize) {
-      toast({
-        title: "Требуется размер",
-        description: "Пожалуйста, выберите размер перед добавлением в корзину",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    addToCart({
-      productId: product.id,
-      size: selectedSize,
-      quantity: 1,
-    });
-    
-    toast({
-      title: "Добавлено в корзину",
-      description: `${product.name} (${selectedSize}) добавлен в вашу корзину`,
-    });
-  };
   
   const handleToggleFavorite = () => {
     if (!user) {
@@ -75,70 +41,56 @@ export default function ProductCard({ product }: ProductCardProps) {
     });
   };
   
-  // Парсим доступные размеры из JSON
-  const availableSizes: string[] = Array.isArray(product.availableSizes) 
-    ? product.availableSizes 
-    : typeof product.availableSizes === 'string' 
-      ? JSON.parse(product.availableSizes) 
-      : [];
-  
   const goToProductPage = () => {
     navigate(`/product/${product.id}`);
   };
   
+  // Получаем категорию для отображения в бейдже
+  const getCategory = () => {
+    if (product.gender === 'men') return 'Мужское';
+    if (product.gender === 'women') return 'Женское';
+    return product.category;
+  };
+  
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 product-card">
+    <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 product-card h-full">
       <div className="relative">
         <img 
           src={product.imageUrl} 
           alt={product.name} 
-          className="w-full h-80 object-cover cursor-pointer"
+          className="w-full h-96 object-cover cursor-pointer"
           onClick={goToProductPage}
         />
         <button 
-          className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
+          className="absolute top-4 right-4 bg-white p-3 rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
           onClick={handleToggleFavorite}
         >
-          <i className={`${isFavorited ? 'fas text-secondary' : 'far text-gray-600 hover:text-secondary'} fa-heart`}></i>
+          <i className={`${isFavorited ? 'fas text-secondary text-xl' : 'far text-gray-600 hover:text-secondary text-xl'} fa-heart`}></i>
         </button>
-      </div>
-      
-      <div className="p-4">
-        <div className="flex justify-between mb-2">
+        
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+          <Badge className="mb-2" variant="secondary">{getCategory()}</Badge>
           <h3 
-            className="font-semibold text-lg cursor-pointer hover:text-primary transition-colors"
+            className="font-semibold text-xl text-white cursor-pointer hover:underline transition-colors truncate"
             onClick={goToProductPage}
           >
             {product.name}
           </h3>
-          <span className="text-lg font-bold text-primary">{formattedPrice(product.price)}</span>
         </div>
-        <p className="text-gray-600 text-sm mb-4">{product.description}</p>
+      </div>
+      
+      <div className="p-5">
+        <p className="text-gray-600 line-clamp-2">{product.description}</p>
         
-        <div className="mb-4">
-          <p className="font-medium text-sm mb-2">Выберите размер:</p>
-          <div className="flex flex-wrap gap-2">
-            {availableSizes.map((size: string) => (
-              <button
-                key={size}
-                className={`size-button ${
-                  selectedSize === size ? "size-button-selected" : ""
-                }`}
-                onClick={() => setSelectedSize(size)}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
+        <div className="mt-4 flex justify-center">
+          <button 
+            className="bg-primary/10 text-primary py-3 px-6 rounded-full font-medium hover:bg-primary hover:text-white transition-colors duration-300 text-sm uppercase tracking-wider flex items-center justify-center"
+            onClick={goToProductPage}
+          >
+            <i className="fas fa-eye mr-2"></i>
+            Подробнее
+          </button>
         </div>
-        
-        <button 
-          className="w-full bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 flex items-center justify-center"
-          onClick={handleAddToCart}
-        >
-          <i className="fas fa-shopping-bag mr-2"></i>
-          Добавить в корзину
-        </button>
       </div>
     </div>
   );
