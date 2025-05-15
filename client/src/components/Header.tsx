@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useCart } from "../contexts/CartContext";
 import { useFavorites } from "../contexts/FavoritesContext";
-import { useQuery } from "@tanstack/react-query";
 import { useFilter } from "../contexts/FilterContext";
 import { useAuth } from "@/hooks/use-auth";
 import { 
@@ -22,14 +21,11 @@ export default function Header() {
   const { setGender } = useFilter();
   const { user, logoutMutation } = useAuth();
   
-  // Get notifications
-  const { data: notifications = [] } = useQuery({
-    queryKey: ['/api/notifications'],
-  });
-  
-  const unreadNotifications = Array.isArray(notifications) 
-    ? notifications.filter((notification: any) => !notification.read)
-    : [];
+  // Проверяем состояние аутентификации и обновляем страницу при изменении
+  useEffect(() => {
+    // Слушаем изменения в состоянии аутентификации
+    console.log("Auth state changed:", user ? `Logged in as ${user.username}` : "Not logged in");
+  }, [user]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,14 +92,7 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <Link href="/notifications" className="relative text-gray-700 hover:text-accent transition-colors duration-200">
-              <i className="far fa-bell text-xl"></i>
-              {unreadNotifications.length > 0 && (
-                <span className="badge">
-                  {unreadNotifications.length}
-                </span>
-              )}
-            </Link>
+
             <Link href="/cart" className="relative text-gray-700 hover:text-accent transition-colors duration-200">
               <i className="fas fa-shopping-bag text-xl"></i>
               {cartItems.length > 0 && (

@@ -41,6 +41,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], user);
       queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
       queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      
+      // Показать уведомление о успешном входе
+      toast({
+        title: "Успешный вход",
+        description: `Добро пожаловать, ${user.username}!`,
+      });
+      
+      // Обновить страницу, чтобы гарантировать корректное обновление UI
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     },
     onError: (error: Error) => {
       toast({
@@ -58,6 +69,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
+      
+      // Показать уведомление о успешной регистрации
+      toast({
+        title: "Успешная регистрация",
+        description: `Добро пожаловать в AmirHub, ${user.username}!`,
+      });
+      
+      // Обновить страницу, чтобы гарантировать корректное обновление UI
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     },
     onError: (error: Error) => {
       toast({
