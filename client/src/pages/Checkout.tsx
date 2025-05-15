@@ -44,7 +44,7 @@ export default function Checkout() {
   const [isOrderComplete, setIsOrderComplete] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const { cartItems, cartTotal } = useCart();
+  const { cartItems, cartTotal, removeFromCart } = useCart();
 
   // Format price from cents to dollars
   const formatPrice = (price: number) => {
@@ -87,9 +87,53 @@ export default function Checkout() {
   const onSubmit = (data: CheckoutInputs) => {
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Order submitted', data);
+    // Генерируем уникальный ID заказа
+    const orderId = `ORD-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const orderDate = new Date().toLocaleDateString('ru-RU');
+    
+    // Создаем объект заказа
+    const order = {
+      id: orderId,
+      date: orderDate,
+      status: "В обработке",
+      items: cartItems.map(item => ({
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+      })),
+      total: cartTotal + deliveryCost,
+      deliveryCost,
+      shippingAddress: {
+        fullName: data.fullName,
+        address: data.address,
+        city: data.city,
+        postalCode: data.postalCode,
+      },
+      paymentMethod: data.paymentMethod,
+      deliveryMethod: data.deliveryMethod,
+      notes: data.notes,
+    };
+    
+    // Сохраняем заказ в localStorage
+    try {
+      // Получаем существующие заказы
+      const existingOrdersJson = localStorage.getItem('orderHistory');
+      let orders = [];
+      if (existingOrdersJson) {
+        orders = JSON.parse(existingOrdersJson);
+      }
+      
+      // Добавляем новый заказ
+      orders.push(order);
+      
+      // Сохраняем обратно в localStorage
+      localStorage.setItem('orderHistory', JSON.stringify(orders));
+      
+      // Очищаем корзину
+      cartItems.forEach(item => removeFromCart(item.id));
+      
+      console.log('Order submitted', order);
+      
       setIsSubmitting(false);
       setIsOrderComplete(true);
       
@@ -97,7 +141,17 @@ export default function Checkout() {
         title: "Заказ оформлен!",
         description: "Ваш заказ успешно оформлен и будет отправлен в ближайшее время.",
       });
-    }, 2000);
+    } catch (error) {
+      console.error('Ошибка при сохранении заказа:', error);
+      
+      setIsSubmitting(false);
+      
+      toast({
+        title: "Ошибка!",
+        description: "Произошла ошибка при оформлении заказа. Пожалуйста, попробуйте снова.",
+        variant: "destructive"
+      });
+    }
   };
 
   // If cart is empty, redirect to cart page

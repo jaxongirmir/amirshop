@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import {
@@ -11,8 +11,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, Package, CheckCircle, Clock, ShoppingBag, User, MapPin, Heart } from "lucide-react";
+import { Loader2, Package, CheckCircle, Clock, ShoppingBag, User, MapPin, Heart, X } from "lucide-react";
 import { useFavorites } from "@/contexts/FavoritesContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Orders() {
   const { user, isLoading } = useAuth();
@@ -37,28 +38,73 @@ export default function Orders() {
     );
   }
 
-  // На данный момент у нас нет реальных заказов, поэтому создадим демо-данные
-  const demoOrders = [
-    {
-      id: "ORD-2023-001",
-      date: "15.05.2023",
-      total: 12500,
-      status: "Доставлен",
-      items: [
-        { name: "Футболка с принтом", price: 2500, quantity: 2 },
-        { name: "Джинсы классические", price: 7500, quantity: 1 },
-      ],
-    },
-    {
-      id: "ORD-2023-002",
-      date: "03.06.2023",
-      total: 5800,
-      status: "В пути",
-      items: [
-        { name: "Кроссовки спортивные", price: 5800, quantity: 1 },
-      ],
-    },
-  ];
+  // Загружаем заказы из localStorage
+  const [orders, setOrders] = useState<any[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [showOrderDetails, setShowOrderDetails] = useState(false);
+  
+  const { toast } = useToast();
+  
+  // Загрузка заказов при монтировании
+  useEffect(() => {
+    try {
+      const savedOrders = localStorage.getItem('orderHistory');
+      if (savedOrders) {
+        const parsedOrders = JSON.parse(savedOrders);
+        // Если есть заказы, устанавливаем их
+        if (Array.isArray(parsedOrders) && parsedOrders.length > 0) {
+          setOrders(parsedOrders);
+          return;
+        }
+      }
+      
+      // Если нет сохраненных заказов, используем демо-данные
+      setOrders([
+        {
+          id: "ORD-2023-001",
+          date: "15.05.2023",
+          total: 12500,
+          status: "Доставлен",
+          items: [
+            { name: "Футболка с принтом", price: 2500, quantity: 2 },
+            { name: "Джинсы классические", price: 7500, quantity: 1 },
+          ],
+        },
+        {
+          id: "ORD-2023-002",
+          date: "03.06.2023",
+          total: 5800,
+          status: "В пути",
+          items: [
+            { name: "Кроссовки спортивные", price: 5800, quantity: 1 },
+          ],
+        },
+      ]);
+    } catch (error) {
+      console.error('Ошибка при загрузке истории заказов:', error);
+    }
+  }, []);
+  
+  // Функция для повторного заказа
+  const handleRepeatOrder = (order: any) => {
+    // В реальном приложении здесь было бы добавление товаров в корзину
+    // через API и перенаправление в корзину
+    toast({
+      title: "Создаем заказ",
+      description: "Добавляем товары в корзину...",
+    });
+    
+    // Перенаправляем на главную страницу (в реальном приложении - в корзину)
+    setTimeout(() => {
+      navigate("/");
+    }, 1500);
+  };
+  
+  // Функция для показа деталей заказа
+  const showDetails = (order: any) => {
+    setSelectedOrder(order);
+    setShowOrderDetails(true);
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -138,9 +184,9 @@ export default function Orders() {
         <div className="lg:col-span-3">
           <h2 className="text-2xl font-bold mb-6">История заказов</h2>
           
-          {demoOrders.length > 0 ? (
+          {orders.length > 0 ? (
             <div className="space-y-6">
-              {demoOrders.map((order) => (
+              {orders.map((order: any) => (
                 <Card key={order.id}>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
