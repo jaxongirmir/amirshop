@@ -49,6 +49,11 @@ export default function Product() {
     if (!product) return;
     
     if (!user) {
+      toast({
+        title: "Требуется авторизация",
+        description: "Пожалуйста, войдите в систему чтобы добавить товар в корзину",
+        variant: "destructive",
+      });
       navigate("/auth");
       return;
     }
@@ -62,34 +67,81 @@ export default function Product() {
       return;
     }
     
-    addToCart({
-      productId: product.id,
-      size: selectedSize,
-      quantity: quantity,
-    });
-    
-    toast({
-      title: "Добавлено в корзину",
-      description: `${product.name} (${selectedSize}) добавлен в вашу корзину`,
-    });
+    try {
+      console.log("Adding to cart:", {
+        productId: product.id,
+        size: selectedSize,
+        quantity: quantity,
+      });
+      
+      // Добавляем товар в корзину
+      addToCart({
+        productId: product.id,
+        size: selectedSize,
+        quantity: quantity,
+      });
+      
+      // Показываем уведомление
+      toast({
+        title: "Добавлено в корзину",
+        description: `${product.name} (${selectedSize}) добавлен в вашу корзину`,
+      });
+      
+      // Обновляем страницу для подтверждения изменений (временное решение)
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast({
+        title: "Ошибка", 
+        description: "Не удалось добавить товар в корзину. Пожалуйста, попробуйте снова.",
+        variant: "destructive",
+      });
+    }
   };
   
   const handleToggleFavorite = () => {
     if (!product) return;
     
     if (!user) {
+      toast({
+        title: "Требуется авторизация",
+        description: "Пожалуйста, войдите в систему чтобы добавить товар в избранное",
+        variant: "destructive",
+      });
       navigate("/auth");
       return;
     }
     
-    toggleFavorite(product.id);
-    
-    toast({
-      title: isFavorite(product.id) ? "Удалено из избранного" : "Добавлено в избранное",
-      description: isFavorite(product.id)
-        ? `${product.name} удален из избранного`
-        : `${product.name} добавлен в избранное`,
-    });
+    try {
+      // Сохраняем текущее состояние избранного до запроса
+      const wasInFavorites = isFavorite(product.id);
+      
+      // Выполняем запрос к API
+      console.log("Toggling favorite for product:", product.id);
+      toggleFavorite(product.id);
+      
+      // Показываем уведомление после успешного запроса
+      toast({
+        title: wasInFavorites ? "Удалено из избранного" : "Добавлено в избранное",
+        description: wasInFavorites
+          ? `${product.name} удален из избранного`
+          : `${product.name} добавлен в избранное`,
+      });
+      
+      // Обновляем страницу для подтверждения изменений (временное решение)
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      toast({
+        title: "Ошибка", 
+        description: "Не удалось обновить избранное. Пожалуйста, попробуйте снова.",
+        variant: "destructive",
+      });
+    }
   };
   
   const handleBuyNow = () => {

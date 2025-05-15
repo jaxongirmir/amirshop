@@ -6,13 +6,18 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Package, CheckCircle, Clock, ShoppingBag } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Loader2, Package, CheckCircle, Clock, ShoppingBag, User, MapPin, Heart, MessageSquare } from "lucide-react";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 export default function Orders() {
   const { user, isLoading } = useAuth();
+  const { favorites } = useFavorites();
   const [, navigate] = useLocation();
+  const [activeTab, setActiveTab] = useState("orders");
 
   if (isLoading) {
     return (
