@@ -5,7 +5,6 @@ import { setupAuth } from "./auth";
 import {
   insertCartItemSchema,
   insertFavoriteSchema,
-  insertNotificationSchema,
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -232,63 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // === Notifications Routes ===
-  // Get notifications
-  apiRouter.get("/notifications", async (req: Request, res: Response) => {
-    try {
-      // If not authenticated, return some demo notifications
-      const userId = req.isAuthenticated() ? req.user!.id : 1;
-      const notifications = await storage.getNotifications(userId);
-      res.json(notifications);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch notifications" });
-    }
-  });
-
-  // Mark notification as read
-  apiRouter.patch(
-    "/notifications/:id",
-    async (req: Request, res: Response) => {
-      try {
-        const id = parseInt(req.params.id);
-        if (isNaN(id)) {
-          return res.status(400).json({ message: "Invalid notification ID" });
-        }
-
-        const notification = await storage.markNotificationAsRead(id);
-        if (!notification) {
-          return res.status(404).json({ message: "Notification not found" });
-        }
-
-        res.json(notification);
-      } catch (error) {
-        res
-          .status(500)
-          .json({ message: "Failed to mark notification as read" });
-      }
-    }
-  );
-
-  // Delete notification
-  apiRouter.delete(
-    "/notifications/:id",
-    async (req: Request, res: Response) => {
-      try {
-        const id = parseInt(req.params.id);
-        if (isNaN(id)) {
-          return res.status(400).json({ message: "Invalid notification ID" });
-        }
-
-        const success = await storage.deleteNotification(id);
-        if (!success) {
-          return res.status(404).json({ message: "Notification not found" });
-        }
-
-        res.status(204).end();
-      } catch (error) {
-        res.status(500).json({ message: "Failed to delete notification" });
-      }
-    }
-  );
+  // Удалены по запросу пользователя
 
   // Register API routes
   app.use("/api", apiRouter);
