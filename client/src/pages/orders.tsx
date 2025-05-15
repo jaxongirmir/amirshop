@@ -230,10 +230,10 @@ export default function Orders() {
                       </div>
                       
                       <div className="flex justify-end">
-                        <Button variant="outline" className="mr-2">
+                        <Button variant="outline" className="mr-2" onClick={() => showDetails(order)}>
                           Детали заказа
                         </Button>
-                        <Button>
+                        <Button onClick={() => handleRepeatOrder(order)}>
                           Повторить заказ
                         </Button>
                       </div>
@@ -255,6 +255,126 @@ export default function Orders() {
                 </Button>
               </CardContent>
             </Card>
+          )}
+          
+          {/* Модальное окно с деталями заказа */}
+          {showOrderDetails && selectedOrder && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <Card className="w-full max-w-3xl max-h-[90vh] overflow-auto">
+                <CardHeader className="sticky top-0 bg-white z-10 border-b flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Детали заказа {selectedOrder.id}</CardTitle>
+                    <CardDescription>от {selectedOrder.date}</CardDescription>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => setShowOrderDetails(false)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-6">
+                    {/* Статус заказа */}
+                    <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                      <div className="flex items-center">
+                        {getStatusIcon(selectedOrder.status)}
+                        <span className="ml-2 font-medium">{selectedOrder.status}</span>
+                      </div>
+                      {selectedOrder.status === "Доставлен" && (
+                        <div className="text-sm text-muted-foreground">
+                          Доставлен {selectedOrder.date}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Информация о заказе */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Товары в заказе</h3>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="text-left text-sm text-gray-500">
+                              <th className="pb-2">Товар</th>
+                              <th className="pb-2 text-right">Цена</th>
+                              <th className="pb-2 text-right">Кол-во</th>
+                              <th className="pb-2 text-right">Итого</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedOrder.items.map((item: any, index: number) => (
+                              <tr key={index} className="border-t border-gray-200">
+                                <td className="py-3">{item.name}</td>
+                                <td className="py-3 text-right">{item.price} ₽</td>
+                                <td className="py-3 text-right">{item.quantity}</td>
+                                <td className="py-3 text-right">{item.price * item.quantity} ₽</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                          <tfoot>
+                            <tr className="border-t border-gray-200">
+                              <td colSpan={3} className="pt-3 text-right">Товары:</td>
+                              <td className="pt-3 text-right">{selectedOrder.total - (selectedOrder.deliveryCost || 0)} ₽</td>
+                            </tr>
+                            {selectedOrder.deliveryCost && (
+                              <tr>
+                                <td colSpan={3} className="pt-1 text-right">Доставка:</td>
+                                <td className="pt-1 text-right">{selectedOrder.deliveryCost} ₽</td>
+                              </tr>
+                            )}
+                            <tr className="border-t border-gray-200 font-semibold">
+                              <td colSpan={3} className="pt-3 text-right">Итого:</td>
+                              <td className="pt-3 text-right">{selectedOrder.total} ₽</td>
+                            </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+                      
+                      {/* Информация о доставке */}
+                      {selectedOrder.shippingAddress && (
+                        <div className="space-y-2">
+                          <h3 className="text-lg font-semibold">Адрес доставки</h3>
+                          <div className="p-4 bg-muted rounded-lg">
+                            <p className="font-medium">{selectedOrder.shippingAddress.fullName}</p>
+                            <p>{selectedOrder.shippingAddress.address}</p>
+                            <p>{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.postalCode}</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Способ оплаты и доставки */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {selectedOrder.paymentMethod && (
+                          <div className="space-y-2">
+                            <h3 className="text-lg font-semibold">Способ оплаты</h3>
+                            <div className="p-4 bg-muted rounded-lg">
+                              <p>{selectedOrder.paymentMethod === "card" ? "Банковская карта" : "Наличные при получении"}</p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedOrder.deliveryMethod && (
+                          <div className="space-y-2">
+                            <h3 className="text-lg font-semibold">Способ доставки</h3>
+                            <div className="p-4 bg-muted rounded-lg">
+                              <p>{selectedOrder.deliveryMethod === "express" ? "Экспресс-доставка" : "Стандартная доставка"}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2 border-t p-4">
+                  <Button variant="outline" onClick={() => setShowOrderDetails(false)}>
+                    Закрыть
+                  </Button>
+                  <Button onClick={() => {
+                    handleRepeatOrder(selectedOrder);
+                    setShowOrderDetails(false);
+                  }}>
+                    Повторить заказ
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
           )}
         </div>
       </div>
