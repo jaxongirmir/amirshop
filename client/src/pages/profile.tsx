@@ -43,29 +43,38 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   
-  // Form state
-  const [formData, setFormData] = useState({
-    username: "",
-    fullName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    postalCode: "",
-    country: "Россия",
-    bio: "",
-    notifications: true
-  });
-  
-  // Initialize form with user data when user loads
-  useState(() => {
-    if (user) {
-      setFormData({
-        ...formData,
-        username: user.username
-      });
+  // Загружаем данные из localStorage, если они есть
+  const getSavedProfile = () => {
+    try {
+      const savedProfile = localStorage.getItem('userProfile');
+      if (savedProfile) {
+        const profile = JSON.parse(savedProfile);
+        // Проверяем, принадлежит ли профиль текущему пользователю
+        if (user && profile.userId === user.id) {
+          return profile;
+        }
+      }
+    } catch (e) {
+      console.error("Ошибка при загрузке профиля:", e);
     }
-  });
+    
+    // Дефолтные данные, если нет сохраненного профиля
+    return {
+      username: user ? user.username : "",
+      fullName: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      postalCode: "",
+      country: "Россия",
+      bio: "",
+      notifications: true
+    };
+  };
+  
+  // Form state
+  const [formData, setFormData] = useState(getSavedProfile());
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -90,11 +99,30 @@ export default function Profile() {
   };
   
   const handleSave = () => {
+    // К этой функции мы никогда не дойдем, если пользователь не авторизован,
+    // так как выше есть проверка на user и возврат из компонента.
+    // Поэтому здесь мы уверены, что user существует.
+    if (!user) return; // Это для TypeScript
+
+    // Здесь будет вызов API для сохранения данных в реальном приложении
     setIsEditing(false);
+    
+    // Для демонстрации, сохраняем данные в localStorage
+    localStorage.setItem('userProfile', JSON.stringify({
+      ...formData,
+      userId: user.id,
+      username: user.username
+    }));
+    
     toast({
       title: "Профиль обновлен",
       description: "Ваши данные успешно сохранены",
     });
+    
+    // Добавляем небольшую задержку, чтобы пользователь увидел изменения
+    setTimeout(() => {
+      window.location.reload();
+    }, 800);
   };
 
   if (isLoading) {
