@@ -473,9 +473,9 @@ export default function Profile() {
       </div>
 
       {/* Statistics Section */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+      <div className="flex justify-center items-center gap-[50px] pt-[50px]">
         <Card>
-          <CardContent className="p-6 flex items-center">
+          <CardContent className="p-6 flex items-center w-[250px]">
             <div className="bg-primary/10 rounded-full p-3 mr-4">
               <Heart className="h-6 w-6 text-primary" />
             </div>
@@ -487,7 +487,7 @@ export default function Profile() {
         </Card>
 
         <Card>
-          <CardContent className="p-6 flex items-center">
+          <CardContent className="p-6 flex items-center w-[250px]">
             <div className="bg-primary/10 rounded-full p-3 mr-4">
               <ShoppingBag className="h-6 w-6 text-primary" />
             </div>
@@ -498,7 +498,7 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* <Card>
           <CardContent className="p-6 flex items-center">
             <div className="bg-primary/10 rounded-full p-3 mr-4">
               <Star className="h-6 w-6 text-primary" />
@@ -508,9 +508,9 @@ export default function Profile() {
               <p className="text-2xl font-bold">0</p>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
-        <Card>
+        {/* <Card>
           <CardContent className="p-6 flex items-center">
             <div className="bg-primary/10 rounded-full p-3 mr-4">
               <CreditCard className="h-6 w-6 text-primary" />
@@ -520,7 +520,7 @@ export default function Profile() {
               <p className="text-2xl font-bold">₽12,500</p>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

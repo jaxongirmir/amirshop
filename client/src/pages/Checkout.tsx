@@ -8,21 +8,25 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  RadioGroup, 
-  RadioGroupItem 
-} from "@/components/ui/radio-group";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, CreditCard, Banknote, Truck, ArrowLeft, CheckCircle } from "lucide-react";
+import {
+  Loader2,
+  CreditCard,
+  Banknote,
+  Truck,
+  ArrowLeft,
+  CheckCircle,
+} from "lucide-react";
 
 // Checkout form schema
 const checkoutSchema = z.object({
@@ -56,7 +60,12 @@ export default function Checkout() {
   const totalWithDelivery = cartTotal + deliveryCost;
 
   // Form setup
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<CheckoutInputs>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<CheckoutInputs>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       fullName: "",
@@ -73,7 +82,7 @@ export default function Checkout() {
 
   // Watch delivery method to update cost
   const deliveryMethod = watch("deliveryMethod");
-  
+
   // Update delivery cost when method changes
   useState(() => {
     if (deliveryMethod === "standard") {
@@ -86,17 +95,19 @@ export default function Checkout() {
   // Process order
   const onSubmit = (data: CheckoutInputs) => {
     setIsSubmitting(true);
-    
+
     // Генерируем уникальный ID заказа
-    const orderId = `ORD-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const orderDate = new Date().toLocaleDateString('ru-RU');
-    
+    const orderId = `ORD-${new Date().getFullYear()}-${Math.floor(
+      1000 + Math.random() * 9000
+    )}`;
+    const orderDate = new Date().toLocaleDateString("ru-RU");
+
     // Создаем объект заказа
     const order = {
       id: orderId,
       date: orderDate,
       status: "В обработке",
-      items: cartItems.map(item => ({
+      items: cartItems.map((item) => ({
         name: item.product.name,
         price: item.product.price,
         quantity: item.quantity,
@@ -113,44 +124,46 @@ export default function Checkout() {
       deliveryMethod: data.deliveryMethod,
       notes: data.notes,
     };
-    
+
     // Сохраняем заказ в localStorage
     try {
       // Получаем существующие заказы
-      const existingOrdersJson = localStorage.getItem('orderHistory');
+      const existingOrdersJson = localStorage.getItem("orderHistory");
       let orders = [];
       if (existingOrdersJson) {
         orders = JSON.parse(existingOrdersJson);
       }
-      
+
       // Добавляем новый заказ
       orders.push(order);
-      
+
       // Сохраняем обратно в localStorage
-      localStorage.setItem('orderHistory', JSON.stringify(orders));
-      
+      localStorage.setItem("orderHistory", JSON.stringify(orders));
+
       // Очищаем корзину
-      // Т.к. работа с API реальной корзины требует отдельного функционала, 
+      // Т.к. работа с API реальной корзины требует отдельного функционала,
       // для демо-целей просто показываем сообщение
-      
-      console.log('Order submitted', order);
-      
+
+      console.log("Order submitted", order);
+
       setIsSubmitting(false);
       setIsOrderComplete(true);
-      
+
       toast({
         title: "Заказ оформлен!",
-        description: "Ваш заказ успешно оформлен и будет отправлен в ближайшее время.",
+        description:
+          "Ваш заказ успешно оформлен и будет отправлен в ближайшее время.",
       });
     } catch (error) {
-      console.error('Ошибка при сохранении заказа:', error);
-      
+      console.error("Ошибка при сохранении заказа:", error);
+
       setIsSubmitting(false);
-      
+
       toast({
         title: "Ошибка!",
-        description: "Произошла ошибка при оформлении заказа. Пожалуйста, попробуйте снова.",
-        variant: "destructive"
+        description:
+          "Произошла ошибка при оформлении заказа. Пожалуйста, попробуйте снова.",
+        variant: "destructive",
       });
     }
   };
@@ -170,19 +183,22 @@ export default function Checkout() {
               <CheckCircle className="h-10 w-10 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">Спасибо за ваш заказ!</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">
+            Спасибо за ваш заказ!
+          </h1>
           <p className="text-gray-600 mb-6">
             Ваш заказ был успешно оформлен и будет доставлен в ближайшее время.
             Мы отправили подтверждение на ваш email.
           </p>
           <div className="bg-muted p-4 rounded-lg mb-6">
-            <h2 className="font-medium mb-2">Номер заказа: #FZ{Math.floor(Math.random() * 10000)}</h2>
-            <p className="text-sm text-muted-foreground">Сохраните этот номер для отслеживания заказа</p>
+            <h2 className="font-medium mb-2">
+              Номер заказа: #FZ{Math.floor(Math.random() * 10000)}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Сохраните этот номер для отслеживания заказа
+            </p>
           </div>
-          <Button 
-            size="lg" 
-            onClick={() => navigate("/")}
-          >
+          <Button size="lg" onClick={() => navigate("/")}>
             Продолжить покупки
           </Button>
         </div>
@@ -193,8 +209,8 @@ export default function Checkout() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-6">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="flex items-center text-gray-600 hover:text-gray-900"
           onClick={() => navigate("/cart")}
         >
@@ -202,9 +218,11 @@ export default function Checkout() {
           Назад к корзине
         </Button>
       </div>
-      
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Оформление заказа</h1>
-      
+
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        Оформление заказа
+      </h1>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Checkout Form */}
         <div className="lg:col-span-2">
@@ -220,126 +238,158 @@ export default function Checkout() {
                     <Label htmlFor="fullName">Имя и фамилия</Label>
                     <Input id="fullName" {...register("fullName")} />
                     {errors.fullName && (
-                      <p className="text-sm text-destructive">{errors.fullName.message}</p>
+                      <p className="text-sm text-destructive">
+                        {errors.fullName.message}
+                      </p>
                     )}
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
                       <Input id="email" type="email" {...register("email")} />
                       {errors.email && (
-                        <p className="text-sm text-destructive">{errors.email.message}</p>
+                        <p className="text-sm text-destructive">
+                          {errors.email.message}
+                        </p>
                       )}
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="phone">Телефон</Label>
                       <Input id="phone" type="tel" {...register("phone")} />
                       {errors.phone && (
-                        <p className="text-sm text-destructive">{errors.phone.message}</p>
+                        <p className="text-sm text-destructive">
+                          {errors.phone.message}
+                        </p>
                       )}
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle>Адрес доставки</CardTitle>
-                <CardDescription>Укажите адрес для доставки заказа</CardDescription>
+                <CardDescription>
+                  Укажите адрес для доставки заказа
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="address">Адрес</Label>
                   <Input id="address" {...register("address")} />
                   {errors.address && (
-                    <p className="text-sm text-destructive">{errors.address.message}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.address.message}
+                    </p>
                   )}
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="city">Город</Label>
                     <Input id="city" {...register("city")} />
                     {errors.city && (
-                      <p className="text-sm text-destructive">{errors.city.message}</p>
+                      <p className="text-sm text-destructive">
+                        {errors.city.message}
+                      </p>
                     )}
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="postalCode">Почтовый индекс</Label>
                     <Input id="postalCode" {...register("postalCode")} />
                     {errors.postalCode && (
-                      <p className="text-sm text-destructive">{errors.postalCode.message}</p>
+                      <p className="text-sm text-destructive">
+                        {errors.postalCode.message}
+                      </p>
                     )}
                   </div>
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle>Способ оплаты</CardTitle>
-                <CardDescription>Выберите удобный способ оплаты</CardDescription>
+                <CardDescription>
+                  Выберите удобный способ оплаты
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <RadioGroup defaultValue="card" className="space-y-4" {...register("paymentMethod")}>
+                <RadioGroup
+                  defaultValue="card"
+                  className="space-y-4"
+                  {...register("paymentMethod")}
+                >
                   <div className="flex items-center space-x-3 p-3 border rounded-md cursor-pointer hover:bg-muted transition-colors">
                     <RadioGroupItem value="card" id="card" />
-                    <Label 
-                      htmlFor="card" 
+                    <Label
+                      htmlFor="card"
                       className="flex items-center space-x-3 cursor-pointer flex-1"
                     >
                       <CreditCard className="h-5 w-5 text-primary/80" />
                       <div>
                         <p className="font-medium">Банковская карта</p>
-                        <p className="text-sm text-muted-foreground">Visa, Mastercard, Mir</p>
+                        <p className="text-sm text-muted-foreground">
+                          Visa, Mastercard, Mir
+                        </p>
                       </div>
                     </Label>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3 p-3 border rounded-md cursor-pointer hover:bg-muted transition-colors">
                     <RadioGroupItem value="cash" id="cash" />
-                    <Label 
-                      htmlFor="cash" 
+                    <Label
+                      htmlFor="cash"
                       className="flex items-center space-x-3 cursor-pointer flex-1"
                     >
                       <Banknote className="h-5 w-5 text-primary/80" />
                       <div>
                         <p className="font-medium">Наличными при получении</p>
-                        <p className="text-sm text-muted-foreground">Оплата курьеру или в пункте выдачи</p>
+                        <p className="text-sm text-muted-foreground">
+                          Оплата курьеру или в пункте выдачи
+                        </p>
                       </div>
                     </Label>
                   </div>
                 </RadioGroup>
               </CardContent>
             </Card>
-            
+
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle>Способ доставки</CardTitle>
-                <CardDescription>Выберите способ доставки заказа</CardDescription>
+                <CardDescription>
+                  Выберите способ доставки заказа
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <RadioGroup defaultValue="standard" className="space-y-4" {...register("deliveryMethod")}>
+                <RadioGroup
+                  defaultValue="standard"
+                  className="space-y-4"
+                  {...register("deliveryMethod")}
+                >
                   <div className="flex items-center space-x-3 p-3 border rounded-md cursor-pointer hover:bg-muted transition-colors">
                     <RadioGroupItem value="standard" id="standard" />
-                    <Label 
-                      htmlFor="standard" 
+                    <Label
+                      htmlFor="standard"
                       className="flex items-center space-x-3 cursor-pointer flex-1"
                     >
                       <Truck className="h-5 w-5 text-primary/80" />
                       <div className="flex-1">
                         <p className="font-medium">Стандартная доставка</p>
-                        <p className="text-sm text-muted-foreground">3-5 рабочих дней</p>
+                        <p className="text-sm text-muted-foreground">
+                          3-5 рабочих дней
+                        </p>
                       </div>
                       <span className="font-medium">$4.99</span>
                     </Label>
                   </div>
-                  
-                  <div className="flex items-center space-x-3 p-3 border rounded-md cursor-pointer hover:bg-muted transition-colors">
+
+                  {/* <div className="flex items-center space-x-3 p-3 border rounded-md cursor-pointer hover:bg-muted transition-colors">
                     <RadioGroupItem value="express" id="express" />
                     <Label 
                       htmlFor="express" 
@@ -352,11 +402,11 @@ export default function Checkout() {
                       </div>
                       <span className="font-medium">$9.99</span>
                     </Label>
-                  </div>
+                  </div> */}
                 </RadioGroup>
               </CardContent>
             </Card>
-            
+
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle>Дополнительная информация</CardTitle>
@@ -371,14 +421,20 @@ export default function Checkout() {
             </Card>
           </form>
         </div>
-        
+
         {/* Order Summary */}
         <div>
           <Card className="sticky top-6">
             <CardHeader>
               <CardTitle>Ваш заказ</CardTitle>
               <CardDescription>
-                {cartItems.length} {cartItems.length === 1 ? 'товар' : cartItems.length < 5 ? 'товара' : 'товаров'} в корзине
+                {cartItems.length}{" "}
+                {cartItems.length === 1
+                  ? "товар"
+                  : cartItems.length < 5
+                  ? "товара"
+                  : "товаров"}{" "}
+                в корзине
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -396,7 +452,9 @@ export default function Checkout() {
                           />
                         </div>
                         <div>
-                          <h3 className="font-medium line-clamp-1">{item.product.name}</h3>
+                          <h3 className="font-medium line-clamp-1">
+                            {item.product.name}
+                          </h3>
                           <div className="text-sm text-muted-foreground">
                             Размер: {item.size} | Кол-во: {item.quantity}
                           </div>
@@ -408,9 +466,9 @@ export default function Checkout() {
                     </div>
                   ))}
                 </div>
-                
+
                 <Separator />
-                
+
                 {/* Price summary */}
                 <div className="space-y-2">
                   <div className="flex justify-between">
@@ -430,9 +488,9 @@ export default function Checkout() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button 
-                type="submit" 
-                className="w-full" 
+              <Button
+                type="submit"
+                className="w-full"
                 size="lg"
                 onClick={handleSubmit(onSubmit)}
                 disabled={isSubmitting}
@@ -443,9 +501,7 @@ export default function Checkout() {
                     Оформление...
                   </>
                 ) : (
-                  <>
-                    Оформить заказ
-                  </>
+                  <>Оформить заказ</>
                 )}
               </Button>
             </CardFooter>
